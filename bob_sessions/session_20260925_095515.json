@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-09-25T09:55:15.586982+00:00",
+  "repo": "/Users/viraj/BlitzDev/demo_api",
+  "pr": null,
+  "files_analyzed": 6,
+  "critical": 17,
+  "warning": 12,
+  "info": 4
+}
