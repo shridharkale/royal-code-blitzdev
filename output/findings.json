@@ -1,17 +1,8 @@
 [
   {
-    "rule_id": "FIN-001",
-    "severity": "HIGH",
-    "file_path": "demo_api/models.py",
-    "line_number": 12,
-    "title": "Float Precision in Ledger Balance",
-    "description": "Column 'balance' uses Float instead of Decimal or integer cents, leading to IEEE-754 rounding drift.",
-    "suggested_fix": "Use Numeric(18, 4) or Integer (cents)."
-  },
-  {
     "rule_id": "FIN-002",
     "severity": "CRITICAL",
-    "file_path": "demo_api/main.py",
+    "file_path": "demo_api\\main.py",
     "line_number": 53,
     "title": "Missing Row-Level Lock on Mutable Balance",
     "description": "Function 'withdraw' reads account balance without with_for_update(). Vulnerable to concurrent race-condition overdrafts.",
@@ -20,7 +11,7 @@
   {
     "rule_id": "FIN-002",
     "severity": "CRITICAL",
-    "file_path": "demo_api/main.py",
+    "file_path": "demo_api\\main.py",
     "line_number": 79,
     "title": "Missing Row-Level Lock on Mutable Balance",
     "description": "Function 'transfer' reads account balance without with_for_update(). Vulnerable to concurrent race-condition overdrafts.",
@@ -29,10 +20,19 @@
   {
     "rule_id": "FIN-003",
     "severity": "CRITICAL",
-    "file_path": "demo_api/main.py",
+    "file_path": "demo_api\\main.py",
     "line_number": 79,
     "title": "Non-Atomic Dual-Commit Ledger Operation",
     "description": "Function 'transfer' commits transactions 2 times. Partial failures will leave ledger in an inconsistent state.",
     "suggested_fix": "Consolidate all ledger stage updates into a single atomic commit or context manager transaction."
+  },
+  {
+    "rule_id": "FIN-001",
+    "severity": "HIGH",
+    "file_path": "demo_api\\models.py",
+    "line_number": 12,
+    "title": "Float Precision in Ledger Balance",
+    "description": "Column 'balance' uses Float instead of Decimal or integer cents, leading to IEEE-754 rounding drift.",
+    "suggested_fix": "Use Numeric(18, 4) or Integer (cents)."
   }
 ]

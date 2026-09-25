@@ -1,0 +1,595 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "BlitzDev FinTech Security Auditor",
+          "version": "1.0.0",
+          "informationUri": "https://github.com/royal-code-blitzdev",
+          "rules": [
+            {
+              "id": "FIN-001",
+              "name": "FloatCurrencyPrecision",
+              "shortDescription": {
+                "text": "Currency columns must use Decimal/Numeric, not Float."
+              },
+              "fullDescription": {
+                "text": "IEEE-754 binary floating-point cannot represent decimal fractions exactly. Using Float for currency balances or amounts causes deterministic rounding drift that compounds across transactions, violating ledger integrity."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://docs.python.org/3/library/decimal.html"
+            },
+            {
+              "id": "FIN-002",
+              "name": "MissingRowLock",
+              "shortDescription": {
+                "text": "Balance reads prior to mutation must use SELECT FOR UPDATE."
+              },
+              "fullDescription": {
+                "text": "Reading a mutable account balance without a row-level lock (SELECT FOR UPDATE / with_for_update()) allows concurrent requests to read the same stale value and both proceed past the balance check, causing overdraft race conditions."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "FIN-003",
+              "name": "NonAtomicTransfer",
+              "shortDescription": {
+                "text": "Dual-entry ledger operations must use a single atomic transaction."
+              },
+              "fullDescription": {
+                "text": "Committing the debit leg and the credit leg of a transfer in separate database transactions creates a window where a crash, OOM, or network failure permanently corrupts the ledger by leaving one leg orphaned."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              }
+            },
+            {
+              "id": "FIN-004",
+              "name": "MissingIdempotencyCheck",
+              "shortDescription": {
+                "text": "Idempotency keys must be validated before processing mutations."
+              },
+              "fullDescription": {
+                "text": "Accepting an idempotency key in the request without querying the database to detect duplicates before executing mutations allows retried or replayed requests to double-credit or double-debit accounts."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "FIN-005",
+              "name": "MissingAuthMiddleware",
+              "shortDescription": {
+                "text": "Balance mutation routes must enforce authentication."
+              },
+              "fullDescription": {
+                "text": "Routes that mutate account balances (/withdraw, /transfer, /deposit) must require authenticated identity via an auth dependency. Unauthenticated access allows any caller to arbitrarily modify balances."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            },
+            {
+              "id": "FIN-006",
+              "name": "BareExceptionHandler",
+              "shortDescription": {
+                "text": "Transaction error handlers must call await session.rollback()."
+              },
+              "fullDescription": {
+                "text": "Exception paths in async database handlers that do not explicitly call await session.rollback() leave the SQLAlchemy session in an indeterminate state, risking partial commits or connection pool exhaustion."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              }
+            },
+            {
+              "id": "FIN-007",
+              "name": "MissingDecimalImport",
+              "shortDescription": {
+                "text": "The decimal module must be imported and used for currency arithmetic."
+              },
+              "fullDescription": {
+                "text": "Currency arithmetic must use decimal.Decimal to prevent IEEE-754 float rounding drift. If the module is not imported, all balance calculations silently operate on floating-point, regardless of the column type."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "FIN-001",
+          "level": "error",
+          "message": {
+            "text": "Column 'balance' in class Account uses Float instead of Numeric(18,4) or Integer cents. IEEE-754 rounding drift will accumulate across every balance mutation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/models.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 13,
+                  "startColumn": 15
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "Account.balance",
+                  "kind": "member"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin001-models-account-balance"
+          }
+        },
+        {
+          "ruleId": "FIN-001",
+          "level": "error",
+          "message": {
+            "text": "Column 'amount' in class Transaction uses Float instead of Numeric(18,4). Every stored transaction amount carries IEEE-754 precision error."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/models.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 20,
+                  "startColumn": 14
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "Transaction.amount",
+                  "kind": "member"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin001-models-transaction-amount"
+          }
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Function 'withdraw' reads account balance without with_for_update(). The artificial asyncio.sleep(0.05) on the original line 60 amplifies the race window. Concurrent requests will both pass the balance check with a stale value and overdraft the account."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 54,
+                  "startColumn": 18
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "withdraw",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin002-main-withdraw-no-lock"
+          }
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Function 'transfer' reads both source and destination accounts without with_for_update(). Concurrent transfers from the same source account can both pass the balance check and double-spend."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 80,
+                  "startColumn": 23
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "transfer",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin002-main-transfer-no-lock"
+          }
+        },
+        {
+          "ruleId": "FIN-003",
+          "level": "error",
+          "message": {
+            "text": "Function 'transfer' issues two separate await db.commit() calls (lines 94 and 98). A crash between the two commits permanently destroys funds: the source is debited but the destination is never credited. This is a critical ACID violation."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 94,
+                  "startColumn": 5
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "transfer",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin003-main-transfer-dual-commit"
+          }
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Function 'deposit' accepts an idempotency_key in the request body but never queries the transactions table to detect duplicate keys. A retried deposit will double-credit the account."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "deposit",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin004-main-deposit-no-idem-check"
+          }
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Function 'withdraw' accepts an idempotency_key but never validates it against existing transactions. A retried withdrawal will double-debit the account."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 52,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "withdraw",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin004-main-withdraw-no-idem-check"
+          }
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Function 'transfer' accepts an idempotency_key but never validates it. A retried transfer will execute both ledger legs a second time."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 78,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "transfer",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin004-main-transfer-no-idem-check"
+          }
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Route POST /accounts/{account_id}/deposit has no authentication dependency. Any unauthenticated caller can deposit arbitrary amounts into any account."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 33,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "deposit",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin005-main-deposit-no-auth"
+          }
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Route POST /accounts/{account_id}/withdraw has no authentication dependency. Any unauthenticated caller can withdraw from any account."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 52,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "withdraw",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin005-main-withdraw-no-auth"
+          }
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Route POST /accounts/transfer has no authentication dependency. Any unauthenticated caller can transfer funds between any two accounts."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 78,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "transfer",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin005-main-transfer-no-auth"
+          }
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "note",
+          "message": {
+            "text": "Function 'deposit' has no try/except block with await db.rollback(). Exceptions during commit leave the async session in an indeterminate state."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 34,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "deposit",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin006-main-deposit-no-rollback"
+          }
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "note",
+          "message": {
+            "text": "Function 'withdraw' has no try/except block with await db.rollback(). Exceptions during commit leave the async session in an indeterminate state."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 52,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "withdraw",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin006-main-withdraw-no-rollback"
+          }
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "note",
+          "message": {
+            "text": "Function 'transfer' has no try/except block with await db.rollback(). Combined with the dual-commit FIN-003 issue, partial commits may not be reliably rolled back."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 78,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "transfer",
+                  "kind": "function"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin006-main-transfer-no-rollback"
+          }
+        },
+        {
+          "ruleId": "FIN-007",
+          "level": "warning",
+          "message": {
+            "text": "The standard library 'decimal' module is never imported in main.py. All balance arithmetic (account.balance +/- req.amount) operates silently on Python float, compounding the IEEE-754 drift from Float model columns."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py",
+                  "uriBaseId": "%SRCROOT%"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1
+                }
+              },
+              "logicalLocations": [
+                {
+                  "name": "module",
+                  "kind": "module"
+                }
+              ]
+            }
+          ],
+          "fingerprints": {
+            "blitzdev/v1": "fin007-main-no-decimal-import"
+          }
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "demo_api/main.py",
+            "uriBaseId": "%SRCROOT%"
+          },
+          "length": 3900,
+          "mimeType": "text/x-python"
+        },
+        {
+          "location": {
+            "uri": "demo_api/models.py",
+            "uriBaseId": "%SRCROOT%"
+          },
+          "length": 660,
+          "mimeType": "text/x-python"
+        },
+        {
+          "location": {
+            "uri": "demo_api/schemas.py",
+            "uriBaseId": "%SRCROOT%"
+          },
+          "length": 420,
+          "mimeType": "text/x-python"
+        }
+      ],
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "toolExecutionNotifications": [],
+          "startTimeUtc": "2025-07-14T00:00:00.000Z",
+          "endTimeUtc": "2025-07-14T00:00:00.000Z"
+        }
+      ]
+    }
+  ]
+}
