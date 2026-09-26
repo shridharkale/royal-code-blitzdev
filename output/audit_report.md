@@ -1,344 +1,807 @@
-# Royal Bank Ledger API — FinTech Transactional Security & ACID Audit
+## 🛡️ BlitzDev — FinTech PR Guardian Report
+**Scan Summary**: 17 files analyzed, 17 critical, 34 warnings, 7 info.
 
-**Audit Date:** 2025-07-14  
-**Auditor:** BlitzDev FinTech Security Mode  
-**Scope:** `demo_api/models.py`, `demo_api/main.py`, `demo_api/schemas.py`, `demo_api/database.py`  
-**Rules Applied:** FIN-001 through FIN-007  
-**Audit Result:** ❌ FAIL — 12 findings across 7 rule categories
+### 🔴 Critical Financial Risks
+**[FIN-001] Float Currency**
+- **Location**: `demo_api/schemas.py` at line 6
+- **Impact**: Using float for money fields (balance, amount, price, total, fee) can lead to precision errors.
+- **Remediation**: Use decimal.Decimal for all monetary values.
+```python
+   3: 
+   4: class AccountCreate(BaseModel):
+   5:     user_id: str = Field(..., min_length=1)
+>> 6:     initial_balance: float = Field(0.0, ge=0.0)
+   7: 
+   8: class WithdrawRequest(BaseModel):
+   9:     amount: float = Field(..., gt=0.0)
+```
 
----
+**[FIN-001] Float Currency**
+- **Location**: `demo_api/schemas.py` at line 9
+- **Impact**: Using float for money fields (balance, amount, price, total, fee) can lead to precision errors.
+- **Remediation**: Use decimal.Decimal for all monetary values.
+```python
+   6:     initial_balance: float = Field(0.0, ge=0.0)
+   7: 
+   8: class WithdrawRequest(BaseModel):
+>> 9:     amount: float = Field(..., gt=0.0)
+   10:     idempotency_key: Optional[str] = None
+   11: 
+   12: class TransferRequest(BaseModel):
+```
 
-## Table of Contents
-1. [Executive Summary](#executive-summary)
-2. [Financial Blast Radius Map](#financial-blast-radius-map)
-3. [Detailed Findings](#detailed-findings)
-4. [Remediation Summary](#remediation-summary)
-5. [Post-Remediation Verification](#post-remediation-verification)
+**[FIN-001] Float Currency**
+- **Location**: `demo_api/schemas.py` at line 15
+- **Impact**: Using float for money fields (balance, amount, price, total, fee) can lead to precision errors.
+- **Remediation**: Use decimal.Decimal for all monetary values.
+```python
+   12: class TransferRequest(BaseModel):
+   13:     from_account_id: int
+   14:     to_account_id: int
+>> 15:     amount: float = Field(..., gt=0.0)
+   16:     idempotency_key: Optional[str] = None
+   17: 
+   18: class DepositRequest(BaseModel):
+```
 
----
+**[FIN-001] Float Currency**
+- **Location**: `demo_api/schemas.py` at line 19
+- **Impact**: Using float for money fields (balance, amount, price, total, fee) can lead to precision errors.
+- **Remediation**: Use decimal.Decimal for all monetary values.
+```python
+   16:     idempotency_key: Optional[str] = None
+   17: 
+   18: class DepositRequest(BaseModel):
+>> 19:     amount: float = Field(..., gt=0.0)
+   20:     idempotency_key: Optional[str] = None
+```
 
-## Executive Summary
+**[FIN-001] Float Currency**
+- **Location**: `demo_api/seed.py` at line 12
+- **Impact**: Using float for money fields (balance, amount, price, total, fee) can lead to precision errors.
+- **Remediation**: Use decimal.Decimal for all monetary values.
+```python
+   9:             await conn.run_sync(Base.metadata.drop_all)
+   10:             await conn.run_sync(Base.metadata.create_all)
+   11:             
+>> 12:         acc1 = Account(id=1, user_id="viraj_primary", balance=100.0)
+   13:         acc2 = Account(id=2, user_id="shridhar_receiver", balance=50.0)
+   14:         
+   15:         session.add_all([acc1, acc2])
+```
 
-The Royal Bank Ledger API contains **critical race-condition vulnerabilities** in both the `/withdraw` and `/transfer` endpoints, a **dual-commit split-brain bug** in `/transfer` that can permanently corrupt the ledger, and **zero authentication enforcement** on all balance-mutation routes. An adversary with network access can overdraft any account to a negative balance by submitting concurrent withdrawal requests, and a server crash mid-transfer will permanently lose funds from one ledger leg.
+**[FIN-001] Float Currency**
+- **Location**: `demo_api/seed.py` at line 13
+- **Impact**: Using float for money fields (balance, amount, price, total, fee) can lead to precision errors.
+- **Remediation**: Use decimal.Decimal for all monetary values.
+```python
+   10:             await conn.run_sync(Base.metadata.create_all)
+   11:             
+   12:         acc1 = Account(id=1, user_id="viraj_primary", balance=100.0)
+>> 13:         acc2 = Account(id=2, user_id="shridhar_receiver", balance=50.0)
+   14:         
+   15:         session.add_all([acc1, acc2])
+   16:         await session.commit()
+```
 
-| Severity | Count | Rules Triggered |
-|----------|-------|-----------------|
-| CRITICAL | 3 | FIN-002, FIN-003 |
-| HIGH     | 9 | FIN-001, FIN-004, FIN-005, FIN-007 |
-| MEDIUM   | 3 | FIN-006 |
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 41
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   38: 
+   39: @app.get("/accounts/{account_id}/balance")
+   40: async def get_balance(account_id: int, db: AsyncSession = Depends(get_db)):
+>> 41:     result = await db.execute(select(Account).where(Account.id == account_id))
+   42:     account = result.scalar_one_or_none()
+   43:     if not account:
+   44:         raise HTTPException(status_code=404, detail="Account not found")
+```
 
----
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 58
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   55:                     select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   56:                 )
+   57:                 if existing_txn.scalar_one_or_none():
+>> 58:                     acc_res = await db.execute(select(Account).where(Account.id == account_id))
+   59:                     acc = acc_res.scalar_one()
+   60:                     return {"message": "Deposit already processed (idempotent replay)", "balance": quantize_amount(acc.balance)}
+   61: 
+```
 
-## Financial Blast Radius Map
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 62
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   59:                     acc = acc_res.scalar_one()
+   60:                     return {"message": "Deposit already processed (idempotent replay)", "balance": quantize_amount(acc.balance)}
+   61: 
+>> 62:             result = await db.execute(select(Account).where(Account.id == account_id))
+   63:             account = result.scalar_one_or_none()
+   64:             if not account:
+   65:                 raise HTTPException(status_code=404, detail="Account not found")
+```
 
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 94
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   91:                     select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   92:                 )
+   93:                 if existing_txn.scalar_one_or_none():
+>> 94:                     acc_res = await db.execute(select(Account).where(Account.id == account_id))
+   95:                     acc = acc_res.scalar_one()
+   96:                     return {"message": "Withdrawal already processed (idempotent replay)", "new_balance": quantize_amount(acc.balance)}
+   97: 
+```
+
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 98
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   95:                     acc = acc_res.scalar_one()
+   96:                     return {"message": "Withdrawal already processed (idempotent replay)", "new_balance": quantize_amount(acc.balance)}
+   97: 
+>> 98:             result = await db.execute(select(Account).where(Account.id == account_id))
+   99:             account = result.scalar_one_or_none()
+   100:             
+   101:             if not account:
+```
+
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 146
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   143:                         select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   144:                     )
+   145:                     if existing_txn.scalar_one_or_none():
+>> 146:                         acc_res = await db.execute(select(Account).where(Account.id == req.from_account_id))
+   147:                         acc = acc_res.scalar_one()
+   148:                         return {"message": "Transfer already processed (idempotent replay)", "source_balance": quantize_amount(acc.balance)}
+   149: 
+```
+
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 150
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   147:                         acc = acc_res.scalar_one()
+   148:                         return {"message": "Transfer already processed (idempotent replay)", "source_balance": quantize_amount(acc.balance)}
+   149: 
+>> 150:                 result_from = await db.execute(select(Account).where(Account.id == req.from_account_id))
+   151:                 source_acc = result_from.scalar_one_or_none()
+   152:                 
+   153:                 result_to = await db.execute(select(Account).where(Account.id == req.to_account_id))
+```
+
+**[FIN-002] Missing Row Lock**
+- **Location**: `demo_api/main.py` at line 153
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   150:                 result_from = await db.execute(select(Account).where(Account.id == req.from_account_id))
+   151:                 source_acc = result_from.scalar_one_or_none()
+   152:                 
+>> 153:                 result_to = await db.execute(select(Account).where(Account.id == req.to_account_id))
+   154:                 dest_acc = result_to.scalar_one_or_none()
+   155:                 
+   156:                 if not source_acc or not dest_acc:
+```
+
+**[FIN-002] Missing Row Lock**
+- **Location**: `tests/test_concurrency_exploit.py` at line 31
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   28: 
+   29:     # 4. Query resulting ledger balance directly from database
+   30:     async with async_session() as session:
+>> 31:         result = await session.execute(select(Account).where(Account.id == 1))
+   32:         account = result.scalar_one()
+   33:         final_balance = account.balance
+   34: 
+```
+
+**[FIN-002] Missing Row Lock**
+- **Location**: `tests/test_concurrency_remediated.py` at line 30
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   27: 
+   28:     # 4. Check final ledger balance directly from database
+   29:     async with async_session() as session:
+>> 30:         result = await session.execute(select(Account).where(Account.id == 1))
+   31:         account = result.scalar_one()
+   32:         final_balance = float(account.balance)
+   33: 
+```
+
+**[FIN-002] Missing Row Lock**
+- **Location**: `tests/test_concurrency_remediated.py` at line 68
+- **Impact**: Missing 'FOR UPDATE' or 'with_for_update' in withdraw/debit patterns.
+- **Remediation**: Use with_for_update() in SQLAlchemy when querying balances to update.
+```python
+   65:         assert "already processed" in res2.json()["message"]
+   66: 
+   67:     async with async_session() as session:
+>> 68:         result = await session.execute(select(Account).where(Account.id == 1))
+   69:         account = result.scalar_one()
+   70:         # Initial was 100.00, should only be debited ONCE to 75.00
+   71:         assert float(account.balance) == 75.0, f"Expected $75.00, got ${account.balance}"
+```
+
+### ⚠️ Warnings & Missing Controls
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `blitzdev_agent/rules.py` at line 73
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   70:         title="Missing Idempotency Check",
+   71:         severity=Severity.WARNING,
+   72:         category=Category.IDEMPOTENCY,
+>> 73:         description="Endpoints accepting idempotency_key but not querying for existing keys.",
+   74:         detection_patterns=[r"idempotency_key(?!\s*.*?query\()"],
+   75:         remediation="Check the database for the idempotency_key before processing the request.",
+   76:     ),
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `blitzdev_agent/rules.py` at line 74
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   71:         severity=Severity.WARNING,
+   72:         category=Category.IDEMPOTENCY,
+   73:         description="Endpoints accepting idempotency_key but not querying for existing keys.",
+>> 74:         detection_patterns=[r"idempotency_key(?!\s*.*?query\()"],
+   75:         remediation="Check the database for the idempotency_key before processing the request.",
+   76:     ),
+   77:     FinTechRule(
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `blitzdev_agent/rules.py` at line 75
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   72:         category=Category.IDEMPOTENCY,
+   73:         description="Endpoints accepting idempotency_key but not querying for existing keys.",
+   74:         detection_patterns=[r"idempotency_key(?!\s*.*?query\()"],
+>> 75:         remediation="Check the database for the idempotency_key before processing the request.",
+   76:     ),
+   77:     FinTechRule(
+   78:         id="FIN-005",
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `blitzdev_agent/test_generator.py` at line 213
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   210:                 # ==============================================================================
+   211: 
+   212:                 @pytest.mark.asyncio
+>> 213:                 async def test_idempotency_key_enforcement(client):
+   214:                     """
+   215:                     Sending identical request with same idempotency key twice must only process once.
+   216:                     """
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `blitzdev_agent/test_generator.py` at line 221
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   218:                     resp = await client.post("/accounts/", json={"user_id": user_id})
+   219:                     account_id = resp.json()["id"]
+   220: 
+>> 221:                     payload = {"amount": 50.0, "idempotency_key": "unique-uuid-key-001"}
+   222: 
+   223:                     r1 = await client.post(f"/accounts/{account_id}/deposit", json=payload)
+   224:                     r2 = await client.post(f"/accounts/{account_id}/deposit", json=payload)
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 53
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   50:     async with lock:
+   51:         try:
+   52:             # FIN-004: Validate idempotency key before mutating balance
+>> 53:             if req.idempotency_key:
+   54:                 existing_txn = await db.execute(
+   55:                     select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   56:                 )
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 55
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   52:             # FIN-004: Validate idempotency key before mutating balance
+   53:             if req.idempotency_key:
+   54:                 existing_txn = await db.execute(
+>> 55:                     select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   56:                 )
+   57:                 if existing_txn.scalar_one_or_none():
+   58:                     acc_res = await db.execute(select(Account).where(Account.id == account_id))
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 72
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   69:                 account_id=account.id,
+   70:                 amount=req.amount,
+   71:                 type="deposit",
+>> 72:                 idempotency_key=req.idempotency_key
+   73:             )
+   74:             db.add(txn)
+   75:             await db.commit()
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 89
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   86:     async with lock:
+   87:         try:
+   88:             # FIN-004: Validate idempotency key to prevent double debit
+>> 89:             if req.idempotency_key:
+   90:                 existing_txn = await db.execute(
+   91:                     select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   92:                 )
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 91
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   88:             # FIN-004: Validate idempotency key to prevent double debit
+   89:             if req.idempotency_key:
+   90:                 existing_txn = await db.execute(
+>> 91:                     select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   92:                 )
+   93:                 if existing_txn.scalar_one_or_none():
+   94:                     acc_res = await db.execute(select(Account).where(Account.id == account_id))
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 114
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   111:                 account_id=account.id,
+   112:                 amount=req.amount,
+   113:                 type="withdraw",
+>> 114:                 idempotency_key=req.idempotency_key
+   115:             )
+   116:             db.add(txn)
+   117:             await db.commit()
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 141
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   138:         async with lock2:
+   139:             try:
+   140:                 # FIN-004: Validate idempotency key for transfers
+>> 141:                 if req.idempotency_key:
+   142:                     existing_txn = await db.execute(
+   143:                         select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   144:                     )
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 143
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   140:                 # FIN-004: Validate idempotency key for transfers
+   141:                 if req.idempotency_key:
+   142:                     existing_txn = await db.execute(
+>> 143:                         select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
+   144:                     )
+   145:                     if existing_txn.scalar_one_or_none():
+   146:                         acc_res = await db.execute(select(Account).where(Account.id == req.from_account_id))
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 165
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   162:                 source_acc.balance = quantize_amount(source_acc.balance - req.amount)
+   163:                 dest_acc.balance = quantize_amount(dest_acc.balance + req.amount)
+   164:                 
+>> 165:                 db.add(Transaction(account_id=source_acc.id, amount=-req.amount, type="transfer_out", idempotency_key=req.idempotency_key))
+   166:                 db.add(Transaction(account_id=dest_acc.id, amount=req.amount, type="transfer_in", idempotency_key=req.idempotency_key))
+   167:                 
+   168:                 # Atomic single commit
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/main.py` at line 166
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   163:                 dest_acc.balance = quantize_amount(dest_acc.balance + req.amount)
+   164:                 
+   165:                 db.add(Transaction(account_id=source_acc.id, amount=-req.amount, type="transfer_out", idempotency_key=req.idempotency_key))
+>> 166:                 db.add(Transaction(account_id=dest_acc.id, amount=req.amount, type="transfer_in", idempotency_key=req.idempotency_key))
+   167:                 
+   168:                 # Atomic single commit
+   169:                 await db.commit()
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/models.py` at line 22
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   19:     account_id = Column(Integer, nullable=False, index=True)
+   20:     amount = Column(Float, nullable=False)
+   21:     type = Column(String(32), nullable=False)
+>> 22:     idempotency_key = Column(String(128), nullable=True, index=True)
+   23:     status = Column(String(32), default="completed", nullable=False)
+   24:     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/schemas.py` at line 10
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   7: 
+   8: class WithdrawRequest(BaseModel):
+   9:     amount: float = Field(..., gt=0.0)
+>> 10:     idempotency_key: Optional[str] = None
+   11: 
+   12: class TransferRequest(BaseModel):
+   13:     from_account_id: int
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/schemas.py` at line 16
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   13:     from_account_id: int
+   14:     to_account_id: int
+   15:     amount: float = Field(..., gt=0.0)
+>> 16:     idempotency_key: Optional[str] = None
+   17: 
+   18: class DepositRequest(BaseModel):
+   19:     amount: float = Field(..., gt=0.0)
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `demo_api/schemas.py` at line 20
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   17: 
+   18: class DepositRequest(BaseModel):
+   19:     amount: float = Field(..., gt=0.0)
+>> 20:     idempotency_key: Optional[str] = None
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `tests/test_concurrency_exploit.py` at line 17
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   14: 
+   15:     # 2. Fire 5 concurrent withdrawal requests of $30 each ($150 total load on $100 balance)
+   16:     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+>> 17:         payload = {"amount": 30.0, "idempotency_key": "concurrent_test"}
+   18:         tasks = [
+   19:             client.post("/accounts/1/withdraw", json=payload)
+   20:             for _ in range(5)
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `tests/test_concurrency_remediated.py` at line 18
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   15:     # 2. Fire 5 distinct concurrent withdrawal requests ($30.00 each = $150 total demand on $100 balance)
+   16:     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+   17:         tasks = [
+>> 18:             client.post("/accounts/1/withdraw", json={"amount": 30.0, "idempotency_key": f"distinct_tx_{i}"})
+   19:             for i in range(5)
+   20:         ]
+   21:         responses = await asyncio.gather(*tasks)
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `tests/test_concurrency_remediated.py` at line 59
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   56:     await seed()
+   57:     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+   58:         # Initial request
+>> 59:         res1 = await client.post("/accounts/1/withdraw", json={"amount": 25.0, "idempotency_key": "unique_idem_key_101"})
+   60:         assert res1.status_code == 200
+   61: 
+   62:         # Duplicate replay
+```
+
+**[FIN-004] Missing Idempotency Check**
+- **Location**: `tests/test_concurrency_remediated.py` at line 63
+- **Impact**: Endpoints accepting idempotency_key but not querying for existing keys.
+- **Remediation**: Check the database for the idempotency_key before processing the request.
+```python
+   60:         assert res1.status_code == 200
+   61: 
+   62:         # Duplicate replay
+>> 63:         res2 = await client.post("/accounts/1/withdraw", json={"amount": 25.0, "idempotency_key": "unique_idem_key_101"})
+   64:         assert res2.status_code == 200
+   65:         assert "already processed" in res2.json()["message"]
+   66: 
+```
+
+**[FIN-005] Missing Auth Middleware**
+- **Location**: `demo_api/main.py` at line 35
+- **Impact**: Route definitions without Depends() for auth.
+- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
+```python
+   32:     lifespan=lifespan
+   33: )
+   34: 
+>> 35: @app.get("/health")
+   36: async def health_check():
+   37:     return {"status": "healthy", "service": "Royal Bank Ledger API (Remediated)"}
+   38: 
+```
+
+**[FIN-005] Missing Auth Middleware**
+- **Location**: `demo_api/main.py` at line 39
+- **Impact**: Route definitions without Depends() for auth.
+- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
+```python
+   36: async def health_check():
+   37:     return {"status": "healthy", "service": "Royal Bank Ledger API (Remediated)"}
+   38: 
+>> 39: @app.get("/accounts/{account_id}/balance")
+   40: async def get_balance(account_id: int, db: AsyncSession = Depends(get_db)):
+   41:     result = await db.execute(select(Account).where(Account.id == account_id))
+   42:     account = result.scalar_one_or_none()
+```
+
+**[FIN-005] Missing Auth Middleware**
+- **Location**: `demo_api/main.py` at line 47
+- **Impact**: Route definitions without Depends() for auth.
+- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
+```python
+   44:         raise HTTPException(status_code=404, detail="Account not found")
+   45:     return {"account_id": account.id, "balance": quantize_amount(account.balance)}
+   46: 
+>> 47: @app.post("/accounts/{account_id}/deposit")
+   48: async def deposit(account_id: int, req: DepositRequest, db: AsyncSession = Depends(get_db)):
+   49:     lock = get_account_lock(account_id)
+   50:     async with lock:
+```
+
+**[FIN-005] Missing Auth Middleware**
+- **Location**: `demo_api/main.py` at line 82
+- **Impact**: Route definitions without Depends() for auth.
+- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
+```python
+   79:             await db.rollback()
+   80:             raise
+   81: 
+>> 82: @app.post("/accounts/{account_id}/withdraw")
+   83: async def withdraw(account_id: int, req: WithdrawRequest, db: AsyncSession = Depends(get_db)):
+   84:     # REMEDIATED (FIN-002): Serialized mutex lock enforces atomic balance validation & debit
+   85:     lock = get_account_lock(account_id)
+```
+
+**[FIN-005] Missing Auth Middleware**
+- **Location**: `demo_api/main.py` at line 124
+- **Impact**: Route definitions without Depends() for auth.
+- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
+```python
+   121:             await db.rollback()
+   122:             raise
+   123: 
+>> 124: @app.post("/accounts/transfer")
+   125: async def transfer(req: TransferRequest, db: AsyncSession = Depends(get_db)):
+   126:     # Guard against self-transfer deadlock
+   127:     if req.from_account_id == req.to_account_id:
+```
+
+**[FIN-006] Bare Exception Handler**
+- **Location**: `blitzdev_agent/analyzer.py` at line 131
+- **Impact**: Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.
+- **Remediation**: Catch specific exceptions and ensure session.rollback() is called on failure.
+```python
+   128:             with open(file_path, "r", encoding="utf-8") as f:
+   129:                 content = f.read()
+   130:             lines = content.splitlines()
+>> 131:         except Exception:
+   132:             return
+   133: 
+   134:         self._extract_entities(file_path, content)
+```
+
+**[FIN-006] Bare Exception Handler**
+- **Location**: `blitzdev_agent/analyzer.py` at line 163
+- **Impact**: Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.
+- **Remediation**: Catch specific exceptions and ensure session.rollback() is called on failure.
+```python
+   160:                                 context=self._get_context(lines, lineno - 1),
+   161:                             )
+   162:                         )
+>> 163:         except Exception:
+   164:             pass
+   165: 
+   166:         # 2. Rule & Pattern Analysis
+```
+
+**[FIN-006] Bare Exception Handler**
+- **Location**: `blitzdev_agent/rules.py` at line 91
+- **Impact**: Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.
+- **Remediation**: Catch specific exceptions and ensure session.rollback() is called on failure.
+```python
+   88:         title="Bare Exception Handler",
+   89:         severity=Severity.WARNING,
+   90:         category=Category.ACID_ROLLBACK,
+>> 91:         description="Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.",
+   92:         detection_patterns=[r"except\s*(?:Exception(?:\s+as\s+\w+)?)?:(?!.*\s*rollback\(\))"],
+   93:         remediation="Catch specific exceptions and ensure session.rollback() is called on failure.",
+   94:     ),
+```
+
+**[FIN-006] Bare Exception Handler**
+- **Location**: `demo_api/main.py` at line 78
+- **Impact**: Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.
+- **Remediation**: Catch specific exceptions and ensure session.rollback() is called on failure.
+```python
+   75:             await db.commit()
+   76:             await db.refresh(account)
+   77:             return {"message": "Deposit successful", "balance": quantize_amount(account.balance)}
+>> 78:         except Exception:
+   79:             await db.rollback()
+   80:             raise
+   81: 
+```
+
+**[FIN-006] Bare Exception Handler**
+- **Location**: `demo_api/main.py` at line 120
+- **Impact**: Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.
+- **Remediation**: Catch specific exceptions and ensure session.rollback() is called on failure.
+```python
+   117:             await db.commit()
+   118:             await db.refresh(account)
+   119:             return {"message": "Withdrawal successful", "new_balance": quantize_amount(account.balance)}
+>> 120:         except Exception:
+   121:             await db.rollback()
+   122:             raise
+   123: 
+```
+
+**[FIN-006] Bare Exception Handler**
+- **Location**: `demo_api/main.py` at line 171
+- **Impact**: Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.
+- **Remediation**: Catch specific exceptions and ensure session.rollback() is called on failure.
+```python
+   168:                 # Atomic single commit
+   169:                 await db.commit()
+   170:                 return {"message": "Transfer completed successfully", "source_balance": quantize_amount(source_acc.balance)}
+>> 171:             except Exception:
+   172:                 await db.rollback()
+   173:                 raise
+```
+
+### ℹ️ Info
+**[FIN-007] Missing Decimal Import**
+- **Location**: `blitzdev_agent/analyzer.py` at line 1
+
+**[FIN-007] Missing Decimal Import**
+- **Location**: `blitzdev_agent/rules.py` at line 1
+
+**[FIN-007] Missing Decimal Import**
+- **Location**: `demo_api/models.py` at line 1
+
+**[FIN-007] Missing Decimal Import**
+- **Location**: `demo_api/schemas.py` at line 1
+
+**[FIN-007] Missing Decimal Import**
+- **Location**: `demo_api/seed.py` at line 1
+
+**[FIN-007] Missing Decimal Import**
+- **Location**: `tests/test_concurrency_exploit.py` at line 1
+
+**[FIN-007] Missing Decimal Import**
+- **Location**: `tests/test_concurrency_remediated.py` at line 1
+
+### 📊 Financial Blast Radius Diagram
 ```mermaid
 flowchart TD
-    subgraph Routes["API Routes (FastAPI)"]
-        DEP["POST /accounts/{id}/deposit"]
-        WDR["POST /accounts/{id}/withdraw"]
-        TRF["POST /accounts/transfer"]
+    subgraph Routes
+        R0["GET /health"]
+        R1["GET /accounts/{account_id}/balance"]
+        R2["POST /accounts/{account_id}/deposit"]
+        R3["POST /accounts/{account_id}/withdraw"]
+        R4["POST /accounts/transfer"]
     end
-
-    subgraph Models["Database Models (SQLAlchemy)"]
-        ACC["Account\n─────────────\nid: Integer PK\nuser_id: String\nbalance: ⚠️ Float"]
-        TXN["Transaction\n─────────────\nid: Integer PK\naccount_id: Integer\namount: ⚠️ Float\nidempotency_key: String"]
+    subgraph Database
+        DB0[("ModelName")]
+        DB1[("Account")]
+        DB2[("Transaction")]
     end
-
-    subgraph Missing["Missing Controls"]
-        AUTH["🔴 FIN-005\nNo Auth Middleware\n(all 3 mutation routes)"]
-        LOCK["🔴 FIN-002\nNo Row Lock\n(SELECT FOR UPDATE missing)"]
-        ATOM["🔴 FIN-003\nDual Commit\n(transfer: 2x await db.commit)"]
-        IDEM["🟠 FIN-004\nNo Idempotency Check\n(key stored, never validated)"]
-        PREC["🟠 FIN-001\nFloat Currency\n(IEEE-754 drift in balance & amount)"]
-        ROLL["🟡 FIN-006\nNo Explicit Rollback\n(bare exception path)"]
-        DIMP["🟠 FIN-007\nDecimal Not Imported\n(arithmetic uses float)"]
+    R0 --> DB0
+    R0 --> DB1
+    R0 --> DB2
+    R1 --> DB0
+    R1 --> DB1
+    R1 --> DB2
+    R2 --> DB0
+    R2 --> DB1
+    R2 --> DB2
+    R3 --> DB0
+    R3 --> DB1
+    R3 --> DB2
+    R4 --> DB0
+    R4 --> DB1
+    R4 --> DB2
+    subgraph Missing Controls
+        M0["❌ [FIN-001] Float Currency"]:::critical
+        M1["❌ [FIN-002] Missing Row Lock"]:::critical
+        M2["❌ [FIN-004] Missing Idempotency Check"]:::warning
+        M3["❌ [FIN-005] Missing Auth Middleware"]:::warning
+        M4["❌ [FIN-006] Bare Exception Handler"]:::warning
+        M5["❌ [FIN-007] Missing Decimal Import"]:::info
     end
-
-    DEP -->|"reads+writes"| ACC
-    DEP -->|"inserts"| TXN
-    WDR -->|"reads+writes"| ACC
-    WDR -->|"inserts"| TXN
-    TRF -->|"reads+writes x2"| ACC
-    TRF -->|"inserts x2"| TXN
-
-    DEP -.->|"UNPROTECTED"| AUTH
-    WDR -.->|"UNPROTECTED"| AUTH
-    TRF -.->|"UNPROTECTED"| AUTH
-
-    WDR -.->|"NO LOCK"| LOCK
-    TRF -.->|"NO LOCK"| LOCK
-
-    TRF -.->|"SPLIT COMMIT"| ATOM
-
-    DEP -.->|"KEY IGNORED"| IDEM
-    WDR -.->|"KEY IGNORED"| IDEM
-    TRF -.->|"KEY IGNORED"| IDEM
-
-    ACC -.->|"FLOAT COLUMN"| PREC
-    TXN -.->|"FLOAT COLUMN"| PREC
-
-    DEP -.->|"NO ROLLBACK"| ROLL
-    WDR -.->|"NO ROLLBACK"| ROLL
-    TRF -.->|"NO ROLLBACK"| ROLL
-
-    DEP -.->|"FLOAT MATH"| DIMP
-    WDR -.->|"FLOAT MATH"| DIMP
-    TRF -.->|"FLOAT MATH"| DIMP
-
-    style LOCK fill:#ff4444,color:#fff
-    style ATOM fill:#ff4444,color:#fff
-    style AUTH fill:#ff4444,color:#fff
-    style IDEM fill:#ff8800,color:#fff
-    style PREC fill:#ff8800,color:#fff
-    style DIMP fill:#ff8800,color:#fff
-    style ROLL fill:#ffcc00,color:#000
+    R0 -.-> M0
+    R1 -.-> M0
+    R2 -.-> M0
+    R3 -.-> M0
+    R4 -.-> M0
+    R3 -.-> M1
+    R2 -.-> M2
+    R3 -.-> M2
+    R0 -.-> M3
+    R1 -.-> M3
+    R2 -.-> M3
+    R3 -.-> M3
+    R4 -.-> M3
+    R0 -.-> M4
+    R1 -.-> M4
+    R2 -.-> M4
+    R3 -.-> M4
+    R4 -.-> M4
+    R0 -.-> M5
+    R1 -.-> M5
+    R2 -.-> M5
+    R3 -.-> M5
+    R4 -.-> M5
+    classDef critical fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#c62828
+    classDef warning fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#ef6c00
+    classDef info fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#1565c0
 ```
 
----
-
-## Detailed Findings
-
-### Finding 1 — FIN-001: Float Currency Precision (Account.balance)
-
-| Field | Value |
-|-------|-------|
-| **Severity** | HIGH |
-| **Rule** | FIN-001 |
-| **Location** | [`demo_api/models.py:13`](../demo_api/models.py) |
-| **Flaw** | `balance = Column(Float, ...)` — IEEE-754 binary floats cannot represent decimal fractions exactly (e.g. `0.1 + 0.2 ≠ 0.3`). Ledger drift accumulates with every transaction. |
-
-**Remediation:**
-```python
-# models.py — replace Float with Numeric
-from sqlalchemy import Column, Integer, String, Numeric, DateTime
-
-balance = Column(Numeric(18, 4), default=0, nullable=False)
-```
+### 💡 Concrete Remediations
+1. **Use `decimal.Decimal`**: Convert all float currency values to `Decimal` types.
+2. **Add `with_for_update()`**: When deducting balances, lock the row to prevent race conditions.
+3. **Atomic Transactions**: Ensure all database operations in a financial transaction commit together.
 
 ---
-
-### Finding 2 — FIN-001: Float Currency Precision (Transaction.amount)
-
-| Field | Value |
-|-------|-------|
-| **Severity** | HIGH |
-| **Rule** | FIN-001 |
-| **Location** | [`demo_api/models.py:20`](../demo_api/models.py) |
-| **Flaw** | `amount = Column(Float, ...)` — same IEEE-754 precision defect on every stored transaction amount. |
-
-**Remediation:**
-```python
-amount = Column(Numeric(18, 4), nullable=False)
-```
-
----
-
-### Finding 3 — FIN-002: Missing Row Lock on withdraw
-
-| Field | Value |
-|-------|-------|
-| **Severity** | CRITICAL |
-| **Rule** | FIN-002 |
-| **Location** | [`demo_api/main.py:54`](../demo_api/main.py) (original) |
-| **Flaw** | `select(Account).where(...)` — plain SELECT. The `asyncio.sleep(0.05)` on line 60 is a built-in race condition amplifier. Two concurrent requests both pass the balance check with the same stale value, both decrement, and the account goes negative. |
-
-**Remediation:**
-```python
-result = await db.execute(
-    select(Account).where(Account.id == account_id).with_for_update()
-)
-```
-
----
-
-### Finding 4 — FIN-002: Missing Row Lock on transfer
-
-| Field | Value |
-|-------|-------|
-| **Severity** | CRITICAL |
-| **Rule** | FIN-002 |
-| **Location** | [`demo_api/main.py:80-83`](../demo_api/main.py) (original) |
-| **Flaw** | Both `SELECT` statements for source and destination accounts are unlocked. Concurrent transfers from the same source account can race past the balance check simultaneously. |
-
-**Remediation:**
-```python
-# Acquire locks in sorted ID order to prevent deadlocks
-lock_ids = sorted([req.from_account_id, req.to_account_id])
-result_first  = await db.execute(select(Account).where(Account.id == lock_ids[0]).with_for_update())
-result_second = await db.execute(select(Account).where(Account.id == lock_ids[1]).with_for_update())
-```
-
----
-
-### Finding 5 — FIN-003: Non-Atomic Dual-Commit in transfer
-
-| Field | Value |
-|-------|-------|
-| **Severity** | CRITICAL |
-| **Rule** | FIN-003 |
-| **Location** | [`demo_api/main.py:94` and `main.py:98`](../demo_api/main.py) (original) |
-| **Flaw** | The transfer function commits the debit (`source_acc.balance -= amount`) at line 94, then commits the credit (`dest_acc.balance += amount`) at line 98 in a **separate transaction**. If the process crashes, OOM-kills, or the DB connection drops between the two commits, funds are permanently destroyed from the source account with no credit to the destination. This is a **critical ledger integrity violation**. |
-
-**Remediation:**
-```python
-# Both ledger mutations in a single db.add / single await db.commit()
-db.add(Transaction(account_id=source_acc.id, amount=-req.amount, type="transfer_out", ...))
-db.add(Transaction(account_id=dest_acc.id,   amount=req.amount,  type="transfer_in",  ...))
-await db.commit()  # ← single atomic commit
-```
-
----
-
-### Finding 6 — FIN-004: No Idempotency Validation on deposit
-
-| Field | Value |
-|-------|-------|
-| **Severity** | HIGH |
-| **Rule** | FIN-004 |
-| **Location** | [`demo_api/main.py:34-48`](../demo_api/main.py) (original) |
-| **Flaw** | `idempotency_key` is accepted in the request and stored in the `Transaction` row, but there is **no pre-mutation lookup** to detect duplicate submissions. A network retry or client bug will double-credit an account. |
-
-**Remediation:**
-```python
-if req.idempotency_key:
-    dup = await db.execute(
-        select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)
-    )
-    if dup.scalar_one_or_none():
-        raise HTTPException(status_code=409, detail="Duplicate idempotency key")
-```
-
----
-
-### Finding 7 — FIN-004: No Idempotency Validation on withdraw
-
-| Field | Value |
-|-------|-------|
-| **Severity** | HIGH |
-| **Rule** | FIN-004 |
-| **Location** | [`demo_api/main.py:52-76`](../demo_api/main.py) (original) |
-| **Flaw** | Same as Finding 6. A retried withdrawal will debit the account twice. |
-
-**Remediation:** Same pattern as Finding 6.
-
----
-
-### Finding 8 — FIN-004: No Idempotency Validation on transfer
-
-| Field | Value |
-|-------|-------|
-| **Severity** | HIGH |
-| **Rule** | FIN-004 |
-| **Location** | [`demo_api/main.py:78-100`](../demo_api/main.py) (original) |
-| **Flaw** | Same as Finding 6. A retried transfer executes both ledger legs a second time. |
-
-**Remediation:** Same pattern as Finding 6.
-
----
-
-### Finding 9 — FIN-005: No Authentication Middleware
-
-| Field | Value |
-|-------|-------|
-| **Severity** | HIGH |
-| **Rule** | FIN-005 |
-| **Location** | [`demo_api/main.py:33, 52, 78`](../demo_api/main.py) (original) |
-| **Flaw** | All three balance-mutation routes (`/deposit`, `/withdraw`, `/transfer`) have **no authentication dependency**. Any unauthenticated caller with network access can mutate any account's balance. |
-
-**Remediation:**
-```python
-from fastapi.security import OAuth2PasswordBearer
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
-    # validate JWT / session token
-    ...
-
-@app.post("/accounts/{account_id}/withdraw")
-async def withdraw(..., current_user = Depends(get_current_user)):
-    ...
-```
-
----
-
-### Finding 10 — FIN-006: No Explicit Rollback on deposit
-
-| Field | Value |
-|-------|-------|
-| **Severity** | MEDIUM |
-| **Rule** | FIN-006 |
-| **Location** | [`demo_api/main.py:34-48`](../demo_api/main.py) (original) |
-| **Flaw** | No `try/except` with `await db.rollback()`. If the `db.commit()` raises mid-flush, the session is left in an indeterminate state. |
-
-**Remediation:**
-```python
-except Exception:
-    await db.rollback()
-    raise
-```
-
----
-
-### Finding 11 — FIN-006: No Explicit Rollback on withdraw / transfer
-
-| Field | Value |
-|-------|-------|
-| **Severity** | MEDIUM |
-| **Rule** | FIN-006 |
-| **Location** | [`demo_api/main.py:52-100`](../demo_api/main.py) (original) |
-| **Flaw** | Same as Finding 10. |
-
-**Remediation:** Same pattern as Finding 10.
-
----
-
-### Finding 12 — FIN-007: Decimal Module Not Imported
-
-| Field | Value |
-|-------|-------|
-| **Severity** | HIGH |
-| **Rule** | FIN-007 |
-| **Location** | [`demo_api/main.py:1-8`](../demo_api/main.py) (original) |
-| **Flaw** | The `decimal` standard library module is never imported. All balance arithmetic (`account.balance + req.amount`, `account.balance - req.amount`) operates on Python `float`, compounding the IEEE-754 drift from the Float columns. |
-
-**Remediation:**
-```python
-from decimal import Decimal
-# Usage:
-account.balance = Decimal(str(account.balance)) + Decimal(str(req.amount))
-```
-
----
-
-## Remediation Summary
-
-All findings have been remediated in [`demo_api/main.py`](../demo_api/main.py). The following table maps each finding to its fix:
-
-| Finding | Rule | Fix Applied |
-|---------|------|-------------|
-| 1, 2 | FIN-001 | `models.py` — change `Float` → `Numeric(18, 4)` on `balance` and `amount` |
-| 3, 4 | FIN-002 | `.with_for_update()` appended to all account SELECTs in `withdraw` and `transfer`; locks acquired in sorted ID order to prevent deadlocks |
-| 5 | FIN-003 | `transfer` now uses a single `await db.commit()` encompassing both debit and credit legs |
-| 6, 7, 8 | FIN-004 | Pre-mutation `SELECT WHERE idempotency_key = ?` guard added to all three mutation endpoints |
-| 9 | FIN-005 | Auth middleware stub documented; `Depends(get_current_user)` must be added to all mutation routes |
-| 10, 11 | FIN-006 | `try/except Exception: await db.rollback(); raise` wraps all mutation handlers |
-| 12 | FIN-007 | `from decimal import Decimal` added; all arithmetic converted to `Decimal(str(...))` pattern |
-
-> **Note (FIN-001 / models.py):** The `models.py` column type changes (`Float` → `Numeric(18, 4)`) require a schema migration (Alembic or equivalent). They are documented here but not auto-applied to `models.py` to avoid unintended migration side effects.
-
----
-
-## Post-Remediation Verification
-
-After applying the remediated `demo_api/main.py`, verify the following:
-
-- [ ] Run `pytest tests/` — all transaction isolation and concurrent overdraft tests pass
-- [ ] Load test `/withdraw` with 50 concurrent requests for the same account — final balance must not go negative
-- [ ] Load test `/transfer` with concurrent bidirectional transfers A→B and B→A — no deadlock, no split balance
-- [ ] Confirm idempotency: submit the same `idempotency_key` twice — second response must be `409 Conflict`
-- [ ] Confirm unauthenticated calls to `/withdraw` return `401 Unauthorized` after auth middleware is wired
-- [ ] Verify `models.py` migration from `Float` → `Numeric(18, 4)` with Alembic `upgrade head`
-
----
-
-*Generated by BlitzDev FinTech Security Auditor — Royal Code BlitzDev*
+_Powered by BlitzDev + IBM Bob 2.0 | Scanned at 2026-09-26 05:11:31 UTC_

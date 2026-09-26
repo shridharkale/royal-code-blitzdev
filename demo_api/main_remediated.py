@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from demo_api.database import get_db, init_db
 from demo_api.models import Account, Transaction
-from demo_api.schemas import AccountCreate, WithdrawRequest, TransferRequest, DepositRequest
+from demo_api.schemas import WithdrawRequest, TransferRequest, DepositRequest
 
 # In-memory mutex registry ensuring deterministic row-level serialization
 _account_locks = {}
@@ -27,25 +27,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Royal Bank Ledger API (Production Hardened)",
-    version="1.3.0",
+    version="1.2.0",
     lifespan=lifespan
 )
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "Royal Bank Ledger API (Production Hardened)"}
-
-@app.post("/accounts", status_code=200)
-@app.post("/accounts/", status_code=200)
-async def create_account(req: AccountCreate, db: AsyncSession = Depends(get_db)):
-    account = Account(
-        user_id=req.user_id,
-        balance=float(to_decimal(req.initial_balance))
-    )
-    db.add(account)
-    await db.commit()
-    await db.refresh(account)
-    return {"id": account.id, "user_id": account.user_id, "balance": float(to_decimal(account.balance))}
 
 @app.get("/accounts/{account_id}/balance")
 async def get_balance(account_id: int, db: AsyncSession = Depends(get_db)):

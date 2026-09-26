@@ -1,17 +1,7 @@
 """
-BlitzDev Test Generator — Automated Exploit Test Creation
-==========================================================
-Generates deterministic pytest-asyncio integration tests that expose
-race conditions, precision drift, atomicity, and idempotency boundaries.
-"""
-from pathlib import Path
-from .analyzer import AnalysisResult
-from .rules import Category
-
-HEADER_TEMPLATE = """\"\"\"
 Auto-generated integration tests by BlitzDev — FinTech Transactional Security.
 Deterministic verification for concurrency, atomicity, and idempotency boundaries.
-\"\"\"
+"""
 import pytest
 import asyncio
 import uuid
@@ -20,12 +10,10 @@ from httpx import ASGITransport
 
 from demo_api.main import app
 from demo_api.seed import seed
-"""
 
-CONCURRENCY_TEST_TEMPLATE = """
 @pytest.mark.asyncio
 async def test_race_condition_concurrent_withdrawals():
-    \"\"\"FIN-002: Verify 5 concurrent withdrawals of $30 on a $100 balance.\"\"\"
+    """FIN-002: Verify 5 concurrent withdrawals of $30 on a $100 balance."""
     await seed()
     async with httpx.AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         tasks = [
@@ -43,16 +31,14 @@ async def test_race_condition_concurrent_withdrawals():
         balance_resp = await client.get("/accounts/1/balance")
         final_balance = balance_resp.json()["balance"]
 
-        print(f"\\n[CONCURRENCY RESULT] Success: {len(successful_withdrawals)}, Rejected: {len(failed_withdrawals)}, Final: ${final_balance}")
+        print(f"\n[CONCURRENCY RESULT] Success: {len(successful_withdrawals)}, Rejected: {len(failed_withdrawals)}, Final: ${final_balance}")
         assert len(successful_withdrawals) == 3, f"Expected 3 successes, got {len(successful_withdrawals)}"
         assert len(failed_withdrawals) == 2, f"Expected 2 rejections, got {len(failed_withdrawals)}"
         assert final_balance == 10.0, f"Expected $10.0 balance, got ${final_balance}"
-"""
 
-ACID_TEST_TEMPLATE = """
 @pytest.mark.asyncio
 async def test_transfer_non_atomic_failure_rollback():
-    \"\"\"FIN-003: Transfer failure to non-existent recipient must rollback source debit.\"\"\"
+    """FIN-003: Transfer failure to non-existent recipient must rollback source debit."""
     await seed()
     async with httpx.AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         transfer_resp = await client.post(
@@ -63,12 +49,10 @@ async def test_transfer_non_atomic_failure_rollback():
 
         balance_resp = await client.get("/accounts/1/balance")
         assert balance_resp.json()["balance"] == 100.0, "Source account balance corrupted on failed transfer!"
-"""
 
-IDEMPOTENCY_TEST_TEMPLATE = """
 @pytest.mark.asyncio
 async def test_idempotency_key_enforcement():
-    \"\"\"FIN-004: Duplicate requests with same idempotency key must not double-process.\"\"\"
+    """FIN-004: Duplicate requests with same idempotency key must not double-process."""
     await seed()
     async with httpx.AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         key = f"key_{uuid.uuid4().hex}"
@@ -83,28 +67,3 @@ async def test_idempotency_key_enforcement():
 
         balance_resp = await client.get("/accounts/1/balance")
         assert balance_resp.json()["balance"] == 75.0, "Idempotency failed: withdrawal processed twice!"
-"""
-
-class TestGenerator:
-    def __init__(self, output_dir: str = "output"):
-        self.output_dir = Path(output_dir)
-
-    def generate(self, result: AnalysisResult) -> str:
-        sections = [HEADER_TEMPLATE.strip()]
-
-        if any(f.rule.category == Category.CONCURRENCY for f in result.findings):
-            sections.append(CONCURRENCY_TEST_TEMPLATE.strip())
-
-        if any(f.rule.category == Category.ACID_ROLLBACK for f in result.findings):
-            sections.append(ACID_TEST_TEMPLATE.strip())
-
-        if any(f.rule.category == Category.IDEMPOTENCY for f in result.findings):
-            sections.append(IDEMPOTENCY_TEST_TEMPLATE.strip())
-
-        return "\n\n".join(sections) + "\n"
-
-    def save(self, test_content: str, filename: str = "test_fintech_race_condition.py") -> Path:
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        filepath = self.output_dir / filename
-        filepath.write_text(test_content, encoding="utf-8")
-        return filepath
