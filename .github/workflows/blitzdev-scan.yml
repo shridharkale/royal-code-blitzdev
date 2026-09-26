@@ -1,0 +1,46 @@
+name: BlitzDev FinTech PR Guardian
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  fintech-security-audit:
+    name: FinTech Security & ACID Verification
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Seed Database
+        run: |
+          python -m demo_api.seed
+
+      - name: Run BlitzDev AST Scanner
+        run: |
+          python -m blitzdev_agent.scanner --target . --report output/
+
+      - name: Run Verification Test Suites
+        run: |
+          pytest tests/ -v
+
+      - name: Upload SARIF to GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: output/blitzdev_report.sarif
+          category: blitzdev-fintech-validator
