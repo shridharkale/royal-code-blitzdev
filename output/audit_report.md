@@ -557,76 +557,27 @@
    66: 
 ```
 
-**[FIN-005] Missing Auth Middleware**
-- **Location**: `demo_api/main.py` at line 35
-- **Impact**: Route definitions without Depends() for auth.
-- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
+**[FIN-005] Missing Auth Middleware — ✅ FIXED**
+- **Status**: Remediated
+- **Fix Applied**: `demo_api/auth.py` now implements `verify_token` using `python-jose` (`jose.jwt.decode`) with HS256 signature verification. All 3 mutation routes carry `dependencies=[Depends(verify_token)]`.
+- **Routes protected**:
+  - `POST /accounts/{account_id}/deposit` — `demo_api/main.py` line 60
+  - `POST /accounts/{account_id}/withdraw` — `demo_api/main.py` line 99
+  - `POST /accounts/transfer` — `demo_api/main.py` line 144
 ```python
-   32:     lifespan=lifespan
-   33: )
-   34: 
->> 35: @app.get("/health")
-   36: async def health_check():
-   37:     return {"status": "healthy", "service": "Royal Bank Ledger API (Remediated)"}
-   38: 
-```
+# demo_api/auth.py
+from jose import JWTError, jwt
 
-**[FIN-005] Missing Auth Middleware**
-- **Location**: `demo_api/main.py` at line 39
-- **Impact**: Route definitions without Depends() for auth.
-- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
-```python
-   36: async def health_check():
-   37:     return {"status": "healthy", "service": "Royal Bank Ledger API (Remediated)"}
-   38: 
->> 39: @app.get("/accounts/{account_id}/balance")
-   40: async def get_balance(account_id: int, db: AsyncSession = Depends(get_db)):
-   41:     result = await db.execute(select(Account).where(Account.id == account_id))
-   42:     account = result.scalar_one_or_none()
-```
+async def verify_token(authorization: Optional[str] = Header(default=None)) -> dict:
+    ...
+    payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    ...
 
-**[FIN-005] Missing Auth Middleware**
-- **Location**: `demo_api/main.py` at line 47
-- **Impact**: Route definitions without Depends() for auth.
-- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
-```python
-   44:         raise HTTPException(status_code=404, detail="Account not found")
-   45:     return {"account_id": account.id, "balance": quantize_amount(account.balance)}
-   46: 
->> 47: @app.post("/accounts/{account_id}/deposit")
-   48: async def deposit(account_id: int, req: DepositRequest, db: AsyncSession = Depends(get_db)):
-   49:     lock = get_account_lock(account_id)
-   50:     async with lock:
+# demo_api/main.py
+@app.post("/accounts/{account_id}/deposit", dependencies=[Depends(verify_token)])
+@app.post("/accounts/{account_id}/withdraw", dependencies=[Depends(verify_token)])
+@app.post("/accounts/transfer", dependencies=[Depends(verify_token)])
 ```
-
-**[FIN-005] Missing Auth Middleware**
-- **Location**: `demo_api/main.py` at line 82
-- **Impact**: Route definitions without Depends() for auth.
-- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
-```python
-   79:             await db.rollback()
-   80:             raise
-   81: 
->> 82: @app.post("/accounts/{account_id}/withdraw")
-   83: async def withdraw(account_id: int, req: WithdrawRequest, db: AsyncSession = Depends(get_db)):
-   84:     # REMEDIATED (FIN-002): Serialized mutex lock enforces atomic balance validation & debit
-   85:     lock = get_account_lock(account_id)
-```
-
-**[FIN-005] Missing Auth Middleware**
-- **Location**: `demo_api/main.py` at line 124
-- **Impact**: Route definitions without Depends() for auth.
-- **Remediation**: Add authentication dependencies like Depends(get_current_user) to your routes.
-```python
-   121:             await db.rollback()
-   122:             raise
-   123: 
->> 124: @app.post("/accounts/transfer")
-   125: async def transfer(req: TransferRequest, db: AsyncSession = Depends(get_db)):
-   126:     # Guard against self-transfer deadlock
-   127:     if req.from_account_id == req.to_account_id:
-```
-
 **[FIN-006] Bare Exception Handler**
 - **Location**: `blitzdev_agent/analyzer.py` at line 131
 - **Impact**: Bare 'except:' or 'except Exception' without proper rollback in financial endpoints.
@@ -766,7 +717,7 @@ flowchart TD
         M0["❌ [FIN-001] Float Currency"]:::critical
         M1["❌ [FIN-002] Missing Row Lock"]:::critical
         M2["❌ [FIN-004] Missing Idempotency Check"]:::warning
-        M3["❌ [FIN-005] Missing Auth Middleware"]:::warning
+        M3["✅ [FIN-005] Auth Middleware — FIXED"]:::fixed
         M4["❌ [FIN-006] Bare Exception Handler"]:::warning
         M5["❌ [FIN-007] Missing Decimal Import"]:::info
     end
@@ -778,8 +729,6 @@ flowchart TD
     R3 -.-> M1
     R2 -.-> M2
     R3 -.-> M2
-    R0 -.-> M3
-    R1 -.-> M3
     R2 -.-> M3
     R3 -.-> M3
     R4 -.-> M3
@@ -796,6 +745,7 @@ flowchart TD
     classDef critical fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#c62828
     classDef warning fill:#fff3e0,stroke:#ef6c00,stroke-width:2px,color:#ef6c00
     classDef info fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#1565c0
+    classDef fixed fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px,color:#2e7d32
 ```
 
 ### 💡 Concrete Remediations

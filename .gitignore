@@ -11,3 +11,4 @@ __pycache__/
 .pytest_cache/
 __pycache__/
 output/test_fintech_generated.py
+.DS_Store

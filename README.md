@@ -1,5 +1,8 @@
 # 🛡️ BlitzDev: FinTech Transactional Security & ACID Compliance Engine
 
+[![BlitzDev FinTech PR Guardian](https://github.com/shridharkale/royal-code-blitzdev/actions/workflows/blitzdev-scan.yml/badge.svg)](https://github.com/shridharkale/royal-code-blitzdev/actions/workflows/blitzdev-scan.yml)
+
+
 An enterprise-grade FinTech vulnerability scanner and automated remediation agent built for **IBM Bob IDE**. BlitzDev inspects financial ledger APIs, flags ACID violations and concurrency flaws, visualizes the financial blast radius, and synthesizes verifiable remediations.
 
 ---
