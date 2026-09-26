@@ -100,7 +100,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/seed.py"
+                  "uri": "seed.py"
                 },
                 "region": {
                   "startLine": 16,
@@ -122,7 +122,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/seed.py"
+                  "uri": "seed.py"
                 },
                 "region": {
                   "startLine": 17,
@@ -144,10 +144,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 52,
+                  "startLine": 53,
                   "snippet": {
                     "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
                   }
@@ -166,10 +166,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 69,
+                  "startLine": 71,
                   "snippet": {
                     "text": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
                   }
@@ -188,10 +188,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 73,
+                  "startLine": 75,
                   "snippet": {
                     "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
                   }
@@ -210,10 +210,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 108,
+                  "startLine": 111,
                   "snippet": {
                     "text": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
                   }
@@ -232,10 +232,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 112,
+                  "startLine": 115,
                   "snippet": {
                     "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
                   }
@@ -254,10 +254,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 162,
+                  "startLine": 166,
                   "snippet": {
                     "text": "acc_res = await db.execute(select(Account).where(Account.id == req.from_account_id))"
                   }
@@ -276,10 +276,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 166,
+                  "startLine": 170,
                   "snippet": {
                     "text": "result_from = await db.execute(select(Account).where(Account.id == req.from_account_id))"
                   }
@@ -298,10 +298,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 169,
+                  "startLine": 173,
                   "snippet": {
                     "text": "result_to = await db.execute(select(Account).where(Account.id == req.to_account_id))"
                   }
@@ -320,7 +320,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 40,
@@ -342,7 +342,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 57,
@@ -364,7 +364,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 61,
@@ -386,7 +386,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 96,
@@ -408,7 +408,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 100,
@@ -430,7 +430,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 150,
@@ -452,7 +452,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 154,
@@ -474,7 +474,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 157,
@@ -496,12 +496,12 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "tests/test_concurrency_exploit.py"
+                  "uri": "main_vulnerable.py"
                 },
                 "region": {
-                  "startLine": 30,
+                  "startLine": 23,
                   "snippet": {
-                    "text": "result = await session.execute(select(Account).where(Account.id == 1))"
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
                   }
                 }
               }
@@ -518,34 +518,12 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "tests/test_concurrency_remediated.py"
+                  "uri": "main_vulnerable.py"
                 },
                 "region": {
-                  "startLine": 30,
+                  "startLine": 32,
                   "snippet": {
-                    "text": "result = await session.execute(select(Account).where(Account.id == 1))"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-002",
-          "level": "error",
-          "message": {
-            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/test_concurrency_remediated.py"
-                },
-                "region": {
-                  "startLine": 68,
-                  "snippet": {
-                    "text": "result = await session.execute(select(Account).where(Account.id == 1))"
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
                   }
                 }
               }
@@ -562,143 +540,33 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "blitzdev_agent/rules.py"
-                },
-                "region": {
-                  "startLine": 78,
-                  "snippet": {
-                    "text": "description=\"Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.\","
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "blitzdev_agent/rules.py"
-                },
-                "region": {
-                  "startLine": 79,
-                  "snippet": {
-                    "text": "detection_patterns=[r\"idempotency_key(?!\\s*.*?query\\()\"],"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "blitzdev_agent/test_generator.py"
-                },
-                "region": {
-                  "startLine": 34,
-                  "snippet": {
-                    "text": "json={\"amount\": 30.0, \"idempotency_key\": f\"tx_{i}_{uuid.uuid4().hex[:6]}\"},"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "blitzdev_agent/test_generator.py"
-                },
-                "region": {
-                  "startLine": 70,
-                  "snippet": {
-                    "text": "async def test_idempotency_key_enforcement():"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "blitzdev_agent/test_generator.py"
-                },
-                "region": {
-                  "startLine": 75,
-                  "snippet": {
-                    "text": "payload = {\"amount\": 25.0, \"idempotency_key\": key}"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py"
-                },
-                "region": {
-                  "startLine": 64,
-                  "snippet": {
-                    "text": "if req.idempotency_key:"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
                   "startLine": 66,
                   "snippet": {
+                    "text": "if req.idempotency_key:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "main.py"
+                },
+                "region": {
+                  "startLine": 68,
+                  "snippet": {
                     "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
                   }
                 }
@@ -716,10 +584,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 86,
+                  "startLine": 88,
                   "snippet": {
                     "text": "idempotency_key=req.idempotency_key"
                   }
@@ -738,10 +606,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 103,
+                  "startLine": 106,
                   "snippet": {
                     "text": "if req.idempotency_key:"
                   }
@@ -760,10 +628,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 105,
+                  "startLine": 108,
                   "snippet": {
                     "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
                   }
@@ -782,10 +650,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 130,
+                  "startLine": 133,
                   "snippet": {
                     "text": "idempotency_key=req.idempotency_key"
                   }
@@ -804,10 +672,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 157,
+                  "startLine": 161,
                   "snippet": {
                     "text": "if req.idempotency_key:"
                   }
@@ -826,10 +694,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 159,
+                  "startLine": 163,
                   "snippet": {
                     "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
                   }
@@ -848,10 +716,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 182,
+                  "startLine": 186,
                   "snippet": {
                     "text": "db.add(Transaction(account_id=source_acc.id, amount=float(-req.amount), type=\"transfer_out\", idempotency_key=req.idempotency_key))"
                   }
@@ -870,10 +738,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 183,
+                  "startLine": 187,
                   "snippet": {
                     "text": "db.add(Transaction(account_id=dest_acc.id, amount=float(req.amount), type=\"transfer_in\", idempotency_key=req.idempotency_key))"
                   }
@@ -892,7 +760,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 52,
@@ -914,7 +782,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 54,
@@ -936,7 +804,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 74,
@@ -958,7 +826,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 91,
@@ -980,7 +848,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 93,
@@ -1002,7 +870,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 118,
@@ -1024,7 +892,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 145,
@@ -1046,7 +914,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 147,
@@ -1068,7 +936,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 170,
@@ -1090,7 +958,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 171,
@@ -1112,7 +980,29 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/models.py"
+                  "uri": "main_vulnerable.py"
+                },
+                "region": {
+                  "startLine": 52,
+                  "snippet": {
+                    "text": "idempotency_key=req.idempotency_key"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "models.py"
                 },
                 "region": {
                   "startLine": 22,
@@ -1134,7 +1024,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/schemas.py"
+                  "uri": "schemas.py"
                 },
                 "region": {
                   "startLine": 12,
@@ -1156,7 +1046,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/schemas.py"
+                  "uri": "schemas.py"
                 },
                 "region": {
                   "startLine": 18,
@@ -1178,100 +1068,12 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/schemas.py"
+                  "uri": "schemas.py"
                 },
                 "region": {
                   "startLine": 22,
                   "snippet": {
                     "text": "idempotency_key: Optional[str] = Field(None, min_length=1, max_length=128)"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/test_concurrency_exploit.py"
-                },
-                "region": {
-                  "startLine": 18,
-                  "snippet": {
-                    "text": "client.post(\"/accounts/1/withdraw\", json={\"amount\": 30.0, \"idempotency_key\": f\"exploit_tx_{i}\"})"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/test_concurrency_remediated.py"
-                },
-                "region": {
-                  "startLine": 18,
-                  "snippet": {
-                    "text": "client.post(\"/accounts/1/withdraw\", json={\"amount\": 30.0, \"idempotency_key\": f\"distinct_tx_{i}\"})"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/test_concurrency_remediated.py"
-                },
-                "region": {
-                  "startLine": 59,
-                  "snippet": {
-                    "text": "res1 = await client.post(\"/accounts/1/withdraw\", json={\"amount\": 25.0, \"idempotency_key\": \"unique_idem_key_101\"})"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/test_concurrency_remediated.py"
-                },
-                "region": {
-                  "startLine": 63,
-                  "snippet": {
-                    "text": "res2 = await client.post(\"/accounts/1/withdraw\", json={\"amount\": 25.0, \"idempotency_key\": \"unique_idem_key_101\"})"
                   }
                 }
               }
@@ -1288,10 +1090,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 34,
+                  "startLine": 35,
                   "snippet": {
                     "text": "@app.get(\"/health\")"
                   }
@@ -1310,10 +1112,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 38,
+                  "startLine": 39,
                   "snippet": {
                     "text": "@app.post(\"/accounts\", status_code=200)"
                   }
@@ -1332,10 +1134,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 39,
+                  "startLine": 40,
                   "snippet": {
                     "text": "@app.post(\"/accounts/\", status_code=200)"
                   }
@@ -1354,10 +1156,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 50,
+                  "startLine": 51,
                   "snippet": {
                     "text": "@app.get(\"/accounts/{account_id}/balance\")"
                   }
@@ -1376,73 +1178,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
-                },
-                "region": {
-                  "startLine": 58,
-                  "snippet": {
-                    "text": "@app.post(\"/accounts/{account_id}/deposit\")"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-005",
-          "level": "warning",
-          "message": {
-            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py"
-                },
-                "region": {
-                  "startLine": 96,
-                  "snippet": {
-                    "text": "@app.post(\"/accounts/{account_id}/withdraw\")"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-005",
-          "level": "warning",
-          "message": {
-            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py"
-                },
-                "region": {
-                  "startLine": 140,
-                  "snippet": {
-                    "text": "@app.post(\"/accounts/transfer\")"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-005",
-          "level": "warning",
-          "message": {
-            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 34,
@@ -1464,7 +1200,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 38,
@@ -1486,7 +1222,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 46,
@@ -1508,7 +1244,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 84,
@@ -1530,7 +1266,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 128,
@@ -1543,21 +1279,43 @@
           ]
         },
         {
-          "ruleId": "FIN-006",
+          "ruleId": "FIN-005",
           "level": "warning",
           "message": {
-            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "blitzdev_agent/analyzer.py"
+                  "uri": "main_vulnerable.py"
                 },
                 "region": {
-                  "startLine": 131,
+                  "startLine": 21,
                   "snippet": {
-                    "text": "except Exception:"
+                    "text": "@app.get(\"/accounts/{account_id}/balance\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "main_vulnerable.py"
+                },
+                "region": {
+                  "startLine": 29,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/{account_id}/withdraw\")"
                   }
                 }
               }
@@ -1574,29 +1332,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "blitzdev_agent/analyzer.py"
-                },
-                "region": {
-                  "startLine": 163,
-                  "snippet": {
-                    "text": "except Exception:"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-006",
-          "level": "warning",
-          "message": {
-            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/database.py"
+                  "uri": "database.py"
                 },
                 "region": {
                   "startLine": 36,
@@ -1618,10 +1354,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 92,
+                  "startLine": 94,
                   "snippet": {
                     "text": "except Exception:"
                   }
@@ -1640,10 +1376,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 136,
+                  "startLine": 139,
                   "snippet": {
                     "text": "except Exception:"
                   }
@@ -1662,10 +1398,10 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py"
+                  "uri": "main.py"
                 },
                 "region": {
-                  "startLine": 188,
+                  "startLine": 192,
                   "snippet": {
                     "text": "except Exception:"
                   }
@@ -1684,7 +1420,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 80,
@@ -1706,7 +1442,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 124,
@@ -1728,7 +1464,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main_remediated.py"
+                  "uri": "main_remediated.py"
                 },
                 "region": {
                   "startLine": 176,
@@ -1750,7 +1486,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/seed.py"
+                  "uri": "seed.py"
                 },
                 "region": {
                   "startLine": 28,
@@ -1772,7 +1508,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "blitzdev_agent/analyzer.py"
+                  "uri": "main_vulnerable.py"
                 },
                 "region": {
                   "startLine": 1,
@@ -1794,7 +1530,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "blitzdev_agent/rules.py"
+                  "uri": "models.py"
                 },
                 "region": {
                   "startLine": 1,
@@ -1816,95 +1552,7 @@
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "blitzdev_agent/test_generator.py"
-                },
-                "region": {
-                  "startLine": 1,
-                  "snippet": {
-                    "text": "# Missing Decimal module import"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-007",
-          "level": "note",
-          "message": {
-            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/models.py"
-                },
-                "region": {
-                  "startLine": 1,
-                  "snippet": {
-                    "text": "# Missing Decimal module import"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-007",
-          "level": "note",
-          "message": {
-            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/seed.py"
-                },
-                "region": {
-                  "startLine": 1,
-                  "snippet": {
-                    "text": "# Missing Decimal module import"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-007",
-          "level": "note",
-          "message": {
-            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/test_concurrency_exploit.py"
-                },
-                "region": {
-                  "startLine": 1,
-                  "snippet": {
-                    "text": "# Missing Decimal module import"
-                  }
-                }
-              }
-            }
-          ]
-        },
-        {
-          "ruleId": "FIN-007",
-          "level": "note",
-          "message": {
-            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "tests/test_concurrency_remediated.py"
+                  "uri": "seed.py"
                 },
                 "region": {
                   "startLine": 1,

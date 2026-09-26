@@ -12,7 +12,7 @@ An enterprise-grade FinTech vulnerability scanner and automated remediation agen
 | **FIN-002** | Critical | Missing Row-Level Locks / Race Conditions | Fixed (Serialized mutex locks / with_for_update) |
 | **FIN-003** | Critical | Non-Atomic Multi-Commit Ledger Mutations | Fixed (Consolidated atomic transaction) |
 | **FIN-004** | High | Unchecked Idempotency Key Injection | Fixed (Idempotency ledger verification) |
-| **FIN-005** | Medium | Missing Authentication Dependencies | Flagged |
+| **FIN-005** | Medium | Missing Authentication Dependencies | Fixed (JWT Bearer verify_token dependency) |
 | **FIN-006** | Medium | Incomplete Rollback Exception Handlers | Fixed (Explicit transaction rollback) |
 | **FIN-007** | High | Implicit Floating-Point Primitives | Fixed (Decimal module imports) |
 

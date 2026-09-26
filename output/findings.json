@@ -6,7 +6,7 @@
     "category": "currency_precision",
     "description": "Using IEEE 754 float types for money fields can lead to precision loss and fractional-cent drift.",
     "remediation": "Enforce decimal.Decimal or integer cents with explicit quantization.",
-    "file_path": "demo_api/seed.py",
+    "file_path": "seed.py",
     "line_number": 16,
     "line_content": "acc1 = Account(id=1, user_id=\"viraj_primary\", balance=100.0)"
   },
@@ -17,7 +17,7 @@
     "category": "currency_precision",
     "description": "Using IEEE 754 float types for money fields can lead to precision loss and fractional-cent drift.",
     "remediation": "Enforce decimal.Decimal or integer cents with explicit quantization.",
-    "file_path": "demo_api/seed.py",
+    "file_path": "seed.py",
     "line_number": 17,
     "line_content": "acc2 = Account(id=2, user_id=\"shridhar_receiver\", balance=50.0)"
   },
@@ -28,8 +28,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 52,
+    "file_path": "main.py",
+    "line_number": 53,
     "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
   {
@@ -39,8 +39,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 69,
+    "file_path": "main.py",
+    "line_number": 71,
     "line_content": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
   },
   {
@@ -50,8 +50,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 73,
+    "file_path": "main.py",
+    "line_number": 75,
     "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
   {
@@ -61,8 +61,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 108,
+    "file_path": "main.py",
+    "line_number": 111,
     "line_content": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
   },
   {
@@ -72,8 +72,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 112,
+    "file_path": "main.py",
+    "line_number": 115,
     "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
   {
@@ -83,8 +83,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 162,
+    "file_path": "main.py",
+    "line_number": 166,
     "line_content": "acc_res = await db.execute(select(Account).where(Account.id == req.from_account_id))"
   },
   {
@@ -94,8 +94,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 166,
+    "file_path": "main.py",
+    "line_number": 170,
     "line_content": "result_from = await db.execute(select(Account).where(Account.id == req.from_account_id))"
   },
   {
@@ -105,8 +105,8 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main.py",
-    "line_number": 169,
+    "file_path": "main.py",
+    "line_number": 173,
     "line_content": "result_to = await db.execute(select(Account).where(Account.id == req.to_account_id))"
   },
   {
@@ -116,7 +116,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 40,
     "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
@@ -127,7 +127,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 57,
     "line_content": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
   },
@@ -138,7 +138,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 61,
     "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
@@ -149,7 +149,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 96,
     "line_content": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
   },
@@ -160,7 +160,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 100,
     "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
@@ -171,7 +171,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 150,
     "line_content": "acc_res = await db.execute(select(Account).where(Account.id == req.from_account_id))"
   },
@@ -182,7 +182,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 154,
     "line_content": "result_from = await db.execute(select(Account).where(Account.id == req.from_account_id))"
   },
@@ -193,7 +193,7 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 157,
     "line_content": "result_to = await db.execute(select(Account).where(Account.id == req.to_account_id))"
   },
@@ -204,9 +204,9 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "tests/test_concurrency_exploit.py",
-    "line_number": 30,
-    "line_content": "result = await session.execute(select(Account).where(Account.id == 1))"
+    "file_path": "main_vulnerable.py",
+    "line_number": 23,
+    "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
   {
     "rule_id": "FIN-002",
@@ -215,20 +215,9 @@
     "category": "concurrency",
     "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
     "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "tests/test_concurrency_remediated.py",
-    "line_number": 30,
-    "line_content": "result = await session.execute(select(Account).where(Account.id == 1))"
-  },
-  {
-    "rule_id": "FIN-002",
-    "title": "Missing Row-Level Concurrency Lock",
-    "severity": "critical",
-    "category": "concurrency",
-    "description": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates.",
-    "remediation": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads.",
-    "file_path": "tests/test_concurrency_remediated.py",
-    "line_number": 68,
-    "line_content": "result = await session.execute(select(Account).where(Account.id == 1))"
+    "file_path": "main_vulnerable.py",
+    "line_number": 32,
+    "line_content": "result = await db.execute(select(Account).where(Account.id == account_id))"
   },
   {
     "rule_id": "FIN-004",
@@ -237,96 +226,8 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "blitzdev_agent/rules.py",
-    "line_number": 78,
-    "line_content": "description=\"Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.\","
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "blitzdev_agent/rules.py",
-    "line_number": 79,
-    "line_content": "detection_patterns=[r\"idempotency_key(?!\\s*.*?query\\()\"],"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "blitzdev_agent/test_generator.py",
-    "line_number": 34,
-    "line_content": "json={\"amount\": 30.0, \"idempotency_key\": f\"tx_{i}_{uuid.uuid4().hex[:6]}\"},"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "blitzdev_agent/test_generator.py",
-    "line_number": 70,
-    "line_content": "async def test_idempotency_key_enforcement():"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "blitzdev_agent/test_generator.py",
-    "line_number": 75,
-    "line_content": "payload = {\"amount\": 25.0, \"idempotency_key\": key}"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 64,
-    "line_content": "if req.idempotency_key:"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
+    "file_path": "main.py",
     "line_number": 66,
-    "line_content": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 86,
-    "line_content": "idempotency_key=req.idempotency_key"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 103,
     "line_content": "if req.idempotency_key:"
   },
   {
@@ -336,8 +237,8 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 105,
+    "file_path": "main.py",
+    "line_number": 68,
     "line_content": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
   },
   {
@@ -347,8 +248,8 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 130,
+    "file_path": "main.py",
+    "line_number": 88,
     "line_content": "idempotency_key=req.idempotency_key"
   },
   {
@@ -358,8 +259,8 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 157,
+    "file_path": "main.py",
+    "line_number": 106,
     "line_content": "if req.idempotency_key:"
   },
   {
@@ -369,8 +270,8 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 159,
+    "file_path": "main.py",
+    "line_number": 108,
     "line_content": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
   },
   {
@@ -380,8 +281,41 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 182,
+    "file_path": "main.py",
+    "line_number": 133,
+    "line_content": "idempotency_key=req.idempotency_key"
+  },
+  {
+    "rule_id": "FIN-004",
+    "title": "Unvalidated Idempotency Key",
+    "severity": "warning",
+    "category": "idempotency",
+    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
+    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
+    "file_path": "main.py",
+    "line_number": 161,
+    "line_content": "if req.idempotency_key:"
+  },
+  {
+    "rule_id": "FIN-004",
+    "title": "Unvalidated Idempotency Key",
+    "severity": "warning",
+    "category": "idempotency",
+    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
+    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
+    "file_path": "main.py",
+    "line_number": 163,
+    "line_content": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
+  },
+  {
+    "rule_id": "FIN-004",
+    "title": "Unvalidated Idempotency Key",
+    "severity": "warning",
+    "category": "idempotency",
+    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
+    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
+    "file_path": "main.py",
+    "line_number": 186,
     "line_content": "db.add(Transaction(account_id=source_acc.id, amount=float(-req.amount), type=\"transfer_out\", idempotency_key=req.idempotency_key))"
   },
   {
@@ -391,8 +325,8 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main.py",
-    "line_number": 183,
+    "file_path": "main.py",
+    "line_number": 187,
     "line_content": "db.add(Transaction(account_id=dest_acc.id, amount=float(req.amount), type=\"transfer_in\", idempotency_key=req.idempotency_key))"
   },
   {
@@ -402,7 +336,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 52,
     "line_content": "if req.idempotency_key:"
   },
@@ -413,7 +347,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 54,
     "line_content": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
   },
@@ -424,7 +358,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 74,
     "line_content": "idempotency_key=req.idempotency_key"
   },
@@ -435,7 +369,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 91,
     "line_content": "if req.idempotency_key:"
   },
@@ -446,7 +380,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 93,
     "line_content": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
   },
@@ -457,7 +391,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 118,
     "line_content": "idempotency_key=req.idempotency_key"
   },
@@ -468,7 +402,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 145,
     "line_content": "if req.idempotency_key:"
   },
@@ -479,7 +413,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 147,
     "line_content": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
   },
@@ -490,7 +424,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 170,
     "line_content": "db.add(Transaction(account_id=source_acc.id, amount=float(-req.amount), type=\"transfer_out\", idempotency_key=req.idempotency_key))"
   },
@@ -501,7 +435,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 171,
     "line_content": "db.add(Transaction(account_id=dest_acc.id, amount=float(req.amount), type=\"transfer_in\", idempotency_key=req.idempotency_key))"
   },
@@ -512,7 +446,18 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/models.py",
+    "file_path": "main_vulnerable.py",
+    "line_number": 52,
+    "line_content": "idempotency_key=req.idempotency_key"
+  },
+  {
+    "rule_id": "FIN-004",
+    "title": "Unvalidated Idempotency Key",
+    "severity": "warning",
+    "category": "idempotency",
+    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
+    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
+    "file_path": "models.py",
     "line_number": 22,
     "line_content": "idempotency_key = Column(String(128), nullable=True, index=True)"
   },
@@ -523,7 +468,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/schemas.py",
+    "file_path": "schemas.py",
     "line_number": 12,
     "line_content": "idempotency_key: Optional[str] = Field(None, min_length=1, max_length=128)"
   },
@@ -534,7 +479,7 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/schemas.py",
+    "file_path": "schemas.py",
     "line_number": 18,
     "line_content": "idempotency_key: Optional[str] = Field(None, min_length=1, max_length=128)"
   },
@@ -545,53 +490,9 @@
     "category": "idempotency",
     "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
     "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "demo_api/schemas.py",
+    "file_path": "schemas.py",
     "line_number": 22,
     "line_content": "idempotency_key: Optional[str] = Field(None, min_length=1, max_length=128)"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "tests/test_concurrency_exploit.py",
-    "line_number": 18,
-    "line_content": "client.post(\"/accounts/1/withdraw\", json={\"amount\": 30.0, \"idempotency_key\": f\"exploit_tx_{i}\"})"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "tests/test_concurrency_remediated.py",
-    "line_number": 18,
-    "line_content": "client.post(\"/accounts/1/withdraw\", json={\"amount\": 30.0, \"idempotency_key\": f\"distinct_tx_{i}\"})"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "tests/test_concurrency_remediated.py",
-    "line_number": 59,
-    "line_content": "res1 = await client.post(\"/accounts/1/withdraw\", json={\"amount\": 25.0, \"idempotency_key\": \"unique_idem_key_101\"})"
-  },
-  {
-    "rule_id": "FIN-004",
-    "title": "Unvalidated Idempotency Key",
-    "severity": "warning",
-    "category": "idempotency",
-    "description": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.",
-    "remediation": "Query database for key existence inside transaction boundary before mutating balances.",
-    "file_path": "tests/test_concurrency_remediated.py",
-    "line_number": 63,
-    "line_content": "res2 = await client.post(\"/accounts/1/withdraw\", json={\"amount\": 25.0, \"idempotency_key\": \"unique_idem_key_101\"})"
   },
   {
     "rule_id": "FIN-005",
@@ -600,8 +501,8 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main.py",
-    "line_number": 34,
+    "file_path": "main.py",
+    "line_number": 35,
     "line_content": "@app.get(\"/health\")"
   },
   {
@@ -611,8 +512,8 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main.py",
-    "line_number": 38,
+    "file_path": "main.py",
+    "line_number": 39,
     "line_content": "@app.post(\"/accounts\", status_code=200)"
   },
   {
@@ -622,8 +523,8 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main.py",
-    "line_number": 39,
+    "file_path": "main.py",
+    "line_number": 40,
     "line_content": "@app.post(\"/accounts/\", status_code=200)"
   },
   {
@@ -633,8 +534,8 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main.py",
-    "line_number": 50,
+    "file_path": "main.py",
+    "line_number": 51,
     "line_content": "@app.get(\"/accounts/{account_id}/balance\")"
   },
   {
@@ -644,40 +545,7 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main.py",
-    "line_number": 58,
-    "line_content": "@app.post(\"/accounts/{account_id}/deposit\")"
-  },
-  {
-    "rule_id": "FIN-005",
-    "title": "Missing Authentication Dependency",
-    "severity": "warning",
-    "category": "auth",
-    "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
-    "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main.py",
-    "line_number": 96,
-    "line_content": "@app.post(\"/accounts/{account_id}/withdraw\")"
-  },
-  {
-    "rule_id": "FIN-005",
-    "title": "Missing Authentication Dependency",
-    "severity": "warning",
-    "category": "auth",
-    "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
-    "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main.py",
-    "line_number": 140,
-    "line_content": "@app.post(\"/accounts/transfer\")"
-  },
-  {
-    "rule_id": "FIN-005",
-    "title": "Missing Authentication Dependency",
-    "severity": "warning",
-    "category": "auth",
-    "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
-    "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 34,
     "line_content": "@app.get(\"/health\")"
   },
@@ -688,7 +556,7 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 38,
     "line_content": "@app.get(\"/accounts/{account_id}/balance\")"
   },
@@ -699,7 +567,7 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 46,
     "line_content": "@app.post(\"/accounts/{account_id}/deposit\")"
   },
@@ -710,7 +578,7 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 84,
     "line_content": "@app.post(\"/accounts/{account_id}/withdraw\")"
   },
@@ -721,20 +589,31 @@
     "category": "auth",
     "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
     "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 128,
     "line_content": "@app.post(\"/accounts/transfer\")"
   },
   {
-    "rule_id": "FIN-006",
-    "title": "Missing Rollback Exception Guard",
+    "rule_id": "FIN-005",
+    "title": "Missing Authentication Dependency",
     "severity": "warning",
-    "category": "acid_rollback",
-    "description": "Database session operations without explicit await session.rollback() on exception.",
-    "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "blitzdev_agent/analyzer.py",
-    "line_number": 131,
-    "line_content": "except Exception:"
+    "category": "auth",
+    "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
+    "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
+    "file_path": "main_vulnerable.py",
+    "line_number": 21,
+    "line_content": "@app.get(\"/accounts/{account_id}/balance\")"
+  },
+  {
+    "rule_id": "FIN-005",
+    "title": "Missing Authentication Dependency",
+    "severity": "warning",
+    "category": "auth",
+    "description": "Financial ledger mutation endpoints declared without Depends() security guards.",
+    "remediation": "Add authentication guards such as Depends(get_current_user) to all routes.",
+    "file_path": "main_vulnerable.py",
+    "line_number": 29,
+    "line_content": "@app.post(\"/accounts/{account_id}/withdraw\")"
   },
   {
     "rule_id": "FIN-006",
@@ -743,18 +622,7 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "blitzdev_agent/analyzer.py",
-    "line_number": 163,
-    "line_content": "except Exception:"
-  },
-  {
-    "rule_id": "FIN-006",
-    "title": "Missing Rollback Exception Guard",
-    "severity": "warning",
-    "category": "acid_rollback",
-    "description": "Database session operations without explicit await session.rollback() on exception.",
-    "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/database.py",
+    "file_path": "database.py",
     "line_number": 36,
     "line_content": "except Exception:"
   },
@@ -765,8 +633,8 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/main.py",
-    "line_number": 92,
+    "file_path": "main.py",
+    "line_number": 94,
     "line_content": "except Exception:"
   },
   {
@@ -776,8 +644,8 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/main.py",
-    "line_number": 136,
+    "file_path": "main.py",
+    "line_number": 139,
     "line_content": "except Exception:"
   },
   {
@@ -787,8 +655,8 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/main.py",
-    "line_number": 188,
+    "file_path": "main.py",
+    "line_number": 192,
     "line_content": "except Exception:"
   },
   {
@@ -798,7 +666,7 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 80,
     "line_content": "except Exception:"
   },
@@ -809,7 +677,7 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 124,
     "line_content": "except Exception:"
   },
@@ -820,7 +688,7 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/main_remediated.py",
+    "file_path": "main_remediated.py",
     "line_number": 176,
     "line_content": "except Exception:"
   },
@@ -831,7 +699,7 @@
     "category": "acid_rollback",
     "description": "Database session operations without explicit await session.rollback() on exception.",
     "remediation": "Include explicit await session.rollback() inside exception handling blocks.",
-    "file_path": "demo_api/seed.py",
+    "file_path": "seed.py",
     "line_number": 28,
     "line_content": "except Exception:"
   },
@@ -842,7 +710,7 @@
     "category": "currency_precision",
     "description": "Financial arithmetic detected in module without explicit decimal.Decimal import.",
     "remediation": "Import and use decimal.Decimal for all monetary calculations.",
-    "file_path": "blitzdev_agent/analyzer.py",
+    "file_path": "main_vulnerable.py",
     "line_number": 1,
     "line_content": "# Missing Decimal module import"
   },
@@ -853,7 +721,7 @@
     "category": "currency_precision",
     "description": "Financial arithmetic detected in module without explicit decimal.Decimal import.",
     "remediation": "Import and use decimal.Decimal for all monetary calculations.",
-    "file_path": "blitzdev_agent/rules.py",
+    "file_path": "models.py",
     "line_number": 1,
     "line_content": "# Missing Decimal module import"
   },
@@ -864,51 +732,7 @@
     "category": "currency_precision",
     "description": "Financial arithmetic detected in module without explicit decimal.Decimal import.",
     "remediation": "Import and use decimal.Decimal for all monetary calculations.",
-    "file_path": "blitzdev_agent/test_generator.py",
-    "line_number": 1,
-    "line_content": "# Missing Decimal module import"
-  },
-  {
-    "rule_id": "FIN-007",
-    "title": "Missing Decimal Module Import",
-    "severity": "info",
-    "category": "currency_precision",
-    "description": "Financial arithmetic detected in module without explicit decimal.Decimal import.",
-    "remediation": "Import and use decimal.Decimal for all monetary calculations.",
-    "file_path": "demo_api/models.py",
-    "line_number": 1,
-    "line_content": "# Missing Decimal module import"
-  },
-  {
-    "rule_id": "FIN-007",
-    "title": "Missing Decimal Module Import",
-    "severity": "info",
-    "category": "currency_precision",
-    "description": "Financial arithmetic detected in module without explicit decimal.Decimal import.",
-    "remediation": "Import and use decimal.Decimal for all monetary calculations.",
-    "file_path": "demo_api/seed.py",
-    "line_number": 1,
-    "line_content": "# Missing Decimal module import"
-  },
-  {
-    "rule_id": "FIN-007",
-    "title": "Missing Decimal Module Import",
-    "severity": "info",
-    "category": "currency_precision",
-    "description": "Financial arithmetic detected in module without explicit decimal.Decimal import.",
-    "remediation": "Import and use decimal.Decimal for all monetary calculations.",
-    "file_path": "tests/test_concurrency_exploit.py",
-    "line_number": 1,
-    "line_content": "# Missing Decimal module import"
-  },
-  {
-    "rule_id": "FIN-007",
-    "title": "Missing Decimal Module Import",
-    "severity": "info",
-    "category": "currency_precision",
-    "description": "Financial arithmetic detected in module without explicit decimal.Decimal import.",
-    "remediation": "Import and use decimal.Decimal for all monetary calculations.",
-    "file_path": "tests/test_concurrency_remediated.py",
+    "file_path": "seed.py",
     "line_number": 1,
     "line_content": "# Missing Decimal module import"
   }

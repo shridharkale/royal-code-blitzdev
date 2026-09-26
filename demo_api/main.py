@@ -7,6 +7,7 @@ from sqlalchemy import select
 from demo_api.database import get_db, init_db
 from demo_api.models import Account, Transaction
 from demo_api.schemas import AccountCreate, WithdrawRequest, TransferRequest, DepositRequest
+from demo_api.auth import verify_token
 
 # In-memory mutex registry ensuring deterministic row-level serialization
 _account_locks = {}
@@ -27,7 +28,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Royal Bank Ledger API (Production Hardened)",
-    version="1.3.0",
+    version="1.4.0",
     lifespan=lifespan
 )
 
@@ -55,7 +56,8 @@ async def get_balance(account_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Account not found")
     return {"account_id": account.id, "balance": float(to_decimal(account.balance))}
 
-@app.post("/accounts/{account_id}/deposit")
+# FIN-005 Remediation: Protected with JWT Bearer Token dependency
+@app.post("/accounts/{account_id}/deposit", dependencies=[Depends(verify_token)])
 async def deposit(account_id: int, req: DepositRequest, db: AsyncSession = Depends(get_db)):
     lock = get_account_lock(account_id)
     async with lock:
@@ -93,7 +95,8 @@ async def deposit(account_id: int, req: DepositRequest, db: AsyncSession = Depen
             await db.rollback()
             raise
 
-@app.post("/accounts/{account_id}/withdraw")
+# FIN-005 Remediation: Protected with JWT Bearer Token dependency
+@app.post("/accounts/{account_id}/withdraw", dependencies=[Depends(verify_token)])
 async def withdraw(account_id: int, req: WithdrawRequest, db: AsyncSession = Depends(get_db)):
     # FIN-002: Serialized row-level mutex prevents concurrent balance race conditions
     lock = get_account_lock(account_id)
@@ -137,7 +140,8 @@ async def withdraw(account_id: int, req: WithdrawRequest, db: AsyncSession = Dep
             await db.rollback()
             raise
 
-@app.post("/accounts/transfer")
+# FIN-005 Remediation: Protected with JWT Bearer Token dependency
+@app.post("/accounts/transfer", dependencies=[Depends(verify_token)])
 async def transfer(req: TransferRequest, db: AsyncSession = Depends(get_db)):
     # Guard against self-transfer deadlock
     if req.from_account_id == req.to_account_id:

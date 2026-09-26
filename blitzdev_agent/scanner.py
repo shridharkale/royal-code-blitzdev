@@ -1,4 +1,5 @@
 import json
+import argparse
 import sys
 from pathlib import Path
 from blitzdev_agent.analyzer import BlitzDevAnalyzer
@@ -56,13 +57,13 @@ def export_sarif(result, output_path: Path):
 
     output_path.write_text(json.dumps(sarif_data, indent=2), encoding="utf-8")
 
-def run_scan(target_dir: str = "."):
+def run_scan(target_dir: str = ".", report_dir: str = "output"):
     repo_path = Path(target_dir).resolve()
     analyzer = BlitzDevAnalyzer(str(repo_path))
     result = analyzer.analyze()
 
-    output_dir = repo_path / "output"
-    output_dir.mkdir(exist_ok=True)
+    output_path = Path(report_dir).resolve()
+    output_path.mkdir(parents=True, exist_ok=True)
 
     # 1. Export JSON findings
     output_data = [
@@ -79,19 +80,21 @@ def run_scan(target_dir: str = "."):
         }
         for f in result.findings
     ]
-    with open(output_dir / "findings.json", "w", encoding="utf-8") as f:
+    with open(output_path / "findings.json", "w", encoding="utf-8") as f:
         json.dump(output_data, f, indent=2)
 
     # 2. Export OASIS SARIF v2.1.0
-    export_sarif(result, output_dir / "blitzdev_report.sarif")
+    export_sarif(result, output_path / "blitzdev_report.sarif")
 
     print("\n" + "=" * 80)
     print(f"🛡️  BLITZDEV FINTECH SECURITY SCAN: {len(result.findings)} VULNERABILITIES IDENTIFIED")
     print("=" * 80)
-    print(f"Files Analyzed:  {result.files_analyzed}")
-    print(f"🔴 Critical:     {result.critical_count}")
-    print(f"⚠️  Warnings:     {result.warning_count}")
-    print(f"ℹ️  Info:         {result.info_count}")
+    print(f"Target Directory: {target_dir}")
+    print(f"Report Directory: {report_dir}")
+    print(f"Files Analyzed:   {result.files_analyzed}")
+    print(f"🔴 Critical:      {result.critical_count}")
+    print(f"⚠️  Warnings:      {result.warning_count}")
+    print(f"ℹ️  Info:          {result.info_count}")
     print("=" * 80)
 
     for f in result.findings[:5]:
@@ -100,11 +103,18 @@ def run_scan(target_dir: str = "."):
         print(f"  Fix:   {f.rule.remediation}\n")
 
     if len(result.findings) > 5:
-        print(f"... and {len(result.findings) - 5} more findings. Full audit report in output/findings.json")
+        print(f"... and {len(result.findings) - 5} more findings. Full audit report in {report_dir}/findings.json")
 
     print(f"\n✅ Artifacts generated:")
-    print(f"  - output/findings.json")
-    print(f"  - output/blitzdev_report.sarif")
+    print(f"  - {report_dir}/findings.json")
+    print(f"  - {report_dir}/blitzdev_report.sarif")
+
+def main():
+    parser = argparse.ArgumentParser(description="BlitzDev FinTech Security & AST Vulnerability Scanner")
+    parser.add_argument("--target", type=str, default=".", help="Directory to scan (default: current directory)")
+    parser.add_argument("--report", type=str, default="output", help="Directory for generated reports (default: output/)")
+    args = parser.parse_args()
+    run_scan(target_dir=args.target, report_dir=args.report)
 
 if __name__ == "__main__":
-    run_scan()
+    main()
