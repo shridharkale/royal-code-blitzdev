@@ -1,11 +1,20 @@
 import pytest
 import asyncio
 import httpx
+from jose import jwt
 from demo_api.main import app
+from demo_api.auth import JWT_SECRET, JWT_ALGORITHM
 from demo_api.seed import seed
 from demo_api.database import async_session
 from demo_api.models import Account
 from sqlalchemy import select
+
+# Shared JWT auth header used by all mutation-route test requests (FIN-005 remediation)
+_AUTH_HEADERS = {
+    "Authorization": "Bearer " + jwt.encode(
+        {"sub": "test-operator"}, JWT_SECRET, algorithm=JWT_ALGORITHM
+    )
+}
 
 @pytest.mark.asyncio
 async def test_remediated_concurrent_withdrawals():
@@ -15,7 +24,7 @@ async def test_remediated_concurrent_withdrawals():
     # 2. Fire 5 distinct concurrent withdrawal requests ($30.00 each = $150 total demand on $100 balance)
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         tasks = [
-            client.post("/accounts/1/withdraw", json={"amount": 30.0, "idempotency_key": f"distinct_tx_{i}"})
+            client.post("/accounts/1/withdraw", json={"amount": 30.0, "idempotency_key": f"distinct_tx_{i}"}, headers=_AUTH_HEADERS)
             for i in range(5)
         ]
         responses = await asyncio.gather(*tasks)
@@ -56,11 +65,11 @@ async def test_idempotency_replay_protection():
     await seed()
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
         # Initial request
-        res1 = await client.post("/accounts/1/withdraw", json={"amount": 25.0, "idempotency_key": "unique_idem_key_101"})
+        res1 = await client.post("/accounts/1/withdraw", json={"amount": 25.0, "idempotency_key": "unique_idem_key_101"}, headers=_AUTH_HEADERS)
         assert res1.status_code == 200
 
         # Duplicate replay
-        res2 = await client.post("/accounts/1/withdraw", json={"amount": 25.0, "idempotency_key": "unique_idem_key_101"})
+        res2 = await client.post("/accounts/1/withdraw", json={"amount": 25.0, "idempotency_key": "unique_idem_key_101"}, headers=_AUTH_HEADERS)
         assert res2.status_code == 200
         assert "already processed" in res2.json()["message"]
 
