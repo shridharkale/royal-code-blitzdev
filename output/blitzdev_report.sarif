@@ -5,100 +5,85 @@
     {
       "tool": {
         "driver": {
-          "name": "BlitzDev FinTech Security Auditor",
-          "version": "1.0.0",
-          "informationUri": "https://github.com/royal-code-blitzdev",
+          "name": "BlitzDev FinTech PR Guardian",
+          "semanticVersion": "1.0.0",
           "rules": [
             {
               "id": "FIN-001",
-              "name": "FloatCurrencyPrecision",
+              "name": "FloatCurrencyPrecisionDrift",
               "shortDescription": {
-                "text": "Currency columns must use Decimal/Numeric, not Float."
+                "text": "Float Currency Precision Drift"
               },
               "fullDescription": {
-                "text": "IEEE-754 binary floating-point cannot represent decimal fractions exactly. Using Float for currency balances or amounts causes deterministic rounding drift that compounds across transactions, violating ledger integrity."
+                "text": "Using IEEE 754 float types for money fields can lead to precision loss and fractional-cent drift."
               },
-              "defaultConfiguration": {
-                "level": "error"
-              },
-              "helpUri": "https://docs.python.org/3/library/decimal.html"
-            },
-            {
-              "id": "FIN-002",
-              "name": "MissingRowLock",
-              "shortDescription": {
-                "text": "Balance reads prior to mutation must use SELECT FOR UPDATE."
-              },
-              "fullDescription": {
-                "text": "Reading a mutable account balance without a row-level lock (SELECT FOR UPDATE / with_for_update()) allows concurrent requests to read the same stale value and both proceed past the balance check, causing overdraft race conditions."
-              },
-              "defaultConfiguration": {
-                "level": "error"
+              "help": {
+                "text": "Enforce decimal.Decimal or integer cents with explicit quantization."
               }
             },
             {
-              "id": "FIN-003",
-              "name": "NonAtomicTransfer",
+              "id": "FIN-002",
+              "name": "MissingRow-LevelConcurrencyLock",
               "shortDescription": {
-                "text": "Dual-entry ledger operations must use a single atomic transaction."
+                "text": "Missing Row-Level Concurrency Lock"
               },
               "fullDescription": {
-                "text": "Committing the debit leg and the credit leg of a transfer in separate database transactions creates a window where a crash, OOM, or network failure permanently corrupts the ledger by leaving one leg orphaned."
+                "text": "Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
               },
-              "defaultConfiguration": {
-                "level": "error"
+              "help": {
+                "text": "Acquire an asynchronous mutex lock or use with_for_update() on balance reads."
               }
             },
             {
               "id": "FIN-004",
-              "name": "MissingIdempotencyCheck",
+              "name": "UnvalidatedIdempotencyKey",
               "shortDescription": {
-                "text": "Idempotency keys must be validated before processing mutations."
+                "text": "Unvalidated Idempotency Key"
               },
               "fullDescription": {
-                "text": "Accepting an idempotency key in the request without querying the database to detect duplicates before executing mutations allows retried or replayed requests to double-credit or double-debit accounts."
+                "text": "Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
               },
-              "defaultConfiguration": {
-                "level": "warning"
+              "help": {
+                "text": "Query database for key existence inside transaction boundary before mutating balances."
               }
             },
             {
               "id": "FIN-005",
-              "name": "MissingAuthMiddleware",
+              "name": "MissingAuthenticationDependency",
               "shortDescription": {
-                "text": "Balance mutation routes must enforce authentication."
+                "text": "Missing Authentication Dependency"
               },
               "fullDescription": {
-                "text": "Routes that mutate account balances (/withdraw, /transfer, /deposit) must require authenticated identity via an auth dependency. Unauthenticated access allows any caller to arbitrarily modify balances."
+                "text": "Financial ledger mutation endpoints declared without Depends() security guards."
               },
-              "defaultConfiguration": {
-                "level": "warning"
+              "help": {
+                "text": "Add authentication guards such as Depends(get_current_user) to all routes."
               }
             },
             {
               "id": "FIN-006",
-              "name": "BareExceptionHandler",
+              "name": "MissingRollbackExceptionGuard",
               "shortDescription": {
-                "text": "Transaction error handlers must call await session.rollback()."
+                "text": "Missing Rollback Exception Guard"
               },
               "fullDescription": {
-                "text": "Exception paths in async database handlers that do not explicitly call await session.rollback() leave the SQLAlchemy session in an indeterminate state, risking partial commits or connection pool exhaustion."
+                "text": "Database session operations without explicit await session.rollback() on exception."
               },
-              "defaultConfiguration": {
-                "level": "note"
+              "help": {
+                "text": "Include explicit await session.rollback() inside exception handling blocks."
               }
             },
             {
               "id": "FIN-007",
-              "name": "MissingDecimalImport",
+              "name": "MissingDecimalModuleImport",
               "shortDescription": {
-                "text": "The decimal module must be imported and used for currency arithmetic."
+                "text": "Missing Decimal Module Import"
               },
               "fullDescription": {
-                "text": "Currency arithmetic must use decimal.Decimal to prevent IEEE-754 float rounding drift. If the module is not imported, all balance calculations silently operate on floating-point, regardless of the column type."
+                "text": "Financial arithmetic detected in module without explicit decimal.Decimal import."
               },
-              "defaultConfiguration": {
-                "level": "warning"
+              "help": {
+                "text": "Import and use decimal.Decimal for all monetary calculations."
               }
             }
           ]
@@ -109,485 +94,1827 @@
           "ruleId": "FIN-001",
           "level": "error",
           "message": {
-            "text": "Column 'balance' in class Account uses Float instead of Numeric(18,4) or Integer cents. IEEE-754 rounding drift will accumulate across every balance mutation."
+            "text": "Float Currency Precision Drift: Using IEEE 754 float types for money fields can lead to precision loss and fractional-cent drift."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/models.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "demo_api/seed.py"
                 },
                 "region": {
-                  "startLine": 13,
-                  "startColumn": 15
+                  "startLine": 16,
+                  "snippet": {
+                    "text": "acc1 = Account(id=1, user_id=\"viraj_primary\", balance=100.0)"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "Account.balance",
-                  "kind": "member"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin001-models-account-balance"
-          }
+          ]
         },
         {
           "ruleId": "FIN-001",
           "level": "error",
           "message": {
-            "text": "Column 'amount' in class Transaction uses Float instead of Numeric(18,4). Every stored transaction amount carries IEEE-754 precision error."
+            "text": "Float Currency Precision Drift: Using IEEE 754 float types for money fields can lead to precision loss and fractional-cent drift."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/models.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "demo_api/seed.py"
                 },
                 "region": {
-                  "startLine": 20,
-                  "startColumn": 14
+                  "startLine": 17,
+                  "snippet": {
+                    "text": "acc2 = Account(id=2, user_id=\"shridhar_receiver\", balance=50.0)"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "Transaction.amount",
-                  "kind": "member"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin001-models-transaction-amount"
-          }
+          ]
         },
         {
           "ruleId": "FIN-002",
           "level": "error",
           "message": {
-            "text": "Function 'withdraw' reads account balance without with_for_update(). The artificial asyncio.sleep(0.05) on the original line 60 amplifies the race window. Concurrent requests will both pass the balance check with a stale value and overdraft the account."
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 52,
+                  "snippet": {
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 69,
+                  "snippet": {
+                    "text": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 73,
+                  "snippet": {
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 108,
+                  "snippet": {
+                    "text": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 112,
+                  "snippet": {
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 162,
+                  "snippet": {
+                    "text": "acc_res = await db.execute(select(Account).where(Account.id == req.from_account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 166,
+                  "snippet": {
+                    "text": "result_from = await db.execute(select(Account).where(Account.id == req.from_account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 169,
+                  "snippet": {
+                    "text": "result_to = await db.execute(select(Account).where(Account.id == req.to_account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 40,
+                  "snippet": {
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 57,
+                  "snippet": {
+                    "text": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 61,
+                  "snippet": {
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 96,
+                  "snippet": {
+                    "text": "acc_res = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 100,
+                  "snippet": {
+                    "text": "result = await db.execute(select(Account).where(Account.id == account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 150,
+                  "snippet": {
+                    "text": "acc_res = await db.execute(select(Account).where(Account.id == req.from_account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 154,
+                  "snippet": {
+                    "text": "result_from = await db.execute(select(Account).where(Account.id == req.from_account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 157,
+                  "snippet": {
+                    "text": "result_to = await db.execute(select(Account).where(Account.id == req.to_account_id))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_exploit.py"
+                },
+                "region": {
+                  "startLine": 30,
+                  "snippet": {
+                    "text": "result = await session.execute(select(Account).where(Account.id == 1))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_remediated.py"
+                },
+                "region": {
+                  "startLine": 30,
+                  "snippet": {
+                    "text": "result = await session.execute(select(Account).where(Account.id == 1))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-002",
+          "level": "error",
+          "message": {
+            "text": "Missing Row-Level Concurrency Lock: Missing serialized mutex locks or SELECT FOR UPDATE during concurrent balance updates."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_remediated.py"
+                },
+                "region": {
+                  "startLine": 68,
+                  "snippet": {
+                    "text": "result = await session.execute(select(Account).where(Account.id == 1))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/rules.py"
+                },
+                "region": {
+                  "startLine": 78,
+                  "snippet": {
+                    "text": "description=\"Accepting an idempotency_key without verifying previous execution allows double-charging on network retry.\","
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/rules.py"
+                },
+                "region": {
+                  "startLine": 79,
+                  "snippet": {
+                    "text": "detection_patterns=[r\"idempotency_key(?!\\s*.*?query\\()\"],"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/test_generator.py"
+                },
+                "region": {
+                  "startLine": 34,
+                  "snippet": {
+                    "text": "json={\"amount\": 30.0, \"idempotency_key\": f\"tx_{i}_{uuid.uuid4().hex[:6]}\"},"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/test_generator.py"
+                },
+                "region": {
+                  "startLine": 70,
+                  "snippet": {
+                    "text": "async def test_idempotency_key_enforcement():"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/test_generator.py"
+                },
+                "region": {
+                  "startLine": 75,
+                  "snippet": {
+                    "text": "payload = {\"amount\": 25.0, \"idempotency_key\": key}"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 64,
+                  "snippet": {
+                    "text": "if req.idempotency_key:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 66,
+                  "snippet": {
+                    "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 86,
+                  "snippet": {
+                    "text": "idempotency_key=req.idempotency_key"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 103,
+                  "snippet": {
+                    "text": "if req.idempotency_key:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 105,
+                  "snippet": {
+                    "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 130,
+                  "snippet": {
+                    "text": "idempotency_key=req.idempotency_key"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 157,
+                  "snippet": {
+                    "text": "if req.idempotency_key:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 159,
+                  "snippet": {
+                    "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 182,
+                  "snippet": {
+                    "text": "db.add(Transaction(account_id=source_acc.id, amount=float(-req.amount), type=\"transfer_out\", idempotency_key=req.idempotency_key))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 183,
+                  "snippet": {
+                    "text": "db.add(Transaction(account_id=dest_acc.id, amount=float(req.amount), type=\"transfer_in\", idempotency_key=req.idempotency_key))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 52,
+                  "snippet": {
+                    "text": "if req.idempotency_key:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
                 },
                 "region": {
                   "startLine": 54,
-                  "startColumn": 18
+                  "snippet": {
+                    "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "withdraw",
-                  "kind": "function"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin002-main-withdraw-no-lock"
-          }
+          ]
         },
         {
-          "ruleId": "FIN-002",
-          "level": "error",
+          "ruleId": "FIN-004",
+          "level": "warning",
           "message": {
-            "text": "Function 'transfer' reads both source and destination accounts without with_for_update(). Concurrent transfers from the same source account can both pass the balance check and double-spend."
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 74,
+                  "snippet": {
+                    "text": "idempotency_key=req.idempotency_key"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 91,
+                  "snippet": {
+                    "text": "if req.idempotency_key:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 93,
+                  "snippet": {
+                    "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 118,
+                  "snippet": {
+                    "text": "idempotency_key=req.idempotency_key"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 145,
+                  "snippet": {
+                    "text": "if req.idempotency_key:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 147,
+                  "snippet": {
+                    "text": "select(Transaction).where(Transaction.idempotency_key == req.idempotency_key)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 170,
+                  "snippet": {
+                    "text": "db.add(Transaction(account_id=source_acc.id, amount=float(-req.amount), type=\"transfer_out\", idempotency_key=req.idempotency_key))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 171,
+                  "snippet": {
+                    "text": "db.add(Transaction(account_id=dest_acc.id, amount=float(req.amount), type=\"transfer_in\", idempotency_key=req.idempotency_key))"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/models.py"
+                },
+                "region": {
+                  "startLine": 22,
+                  "snippet": {
+                    "text": "idempotency_key = Column(String(128), nullable=True, index=True)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/schemas.py"
+                },
+                "region": {
+                  "startLine": 12,
+                  "snippet": {
+                    "text": "idempotency_key: Optional[str] = Field(None, min_length=1, max_length=128)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/schemas.py"
+                },
+                "region": {
+                  "startLine": 18,
+                  "snippet": {
+                    "text": "idempotency_key: Optional[str] = Field(None, min_length=1, max_length=128)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/schemas.py"
+                },
+                "region": {
+                  "startLine": 22,
+                  "snippet": {
+                    "text": "idempotency_key: Optional[str] = Field(None, min_length=1, max_length=128)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_exploit.py"
+                },
+                "region": {
+                  "startLine": 18,
+                  "snippet": {
+                    "text": "client.post(\"/accounts/1/withdraw\", json={\"amount\": 30.0, \"idempotency_key\": f\"exploit_tx_{i}\"})"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_remediated.py"
+                },
+                "region": {
+                  "startLine": 18,
+                  "snippet": {
+                    "text": "client.post(\"/accounts/1/withdraw\", json={\"amount\": 30.0, \"idempotency_key\": f\"distinct_tx_{i}\"})"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_remediated.py"
+                },
+                "region": {
+                  "startLine": 59,
+                  "snippet": {
+                    "text": "res1 = await client.post(\"/accounts/1/withdraw\", json={\"amount\": 25.0, \"idempotency_key\": \"unique_idem_key_101\"})"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-004",
+          "level": "warning",
+          "message": {
+            "text": "Unvalidated Idempotency Key: Accepting an idempotency_key without verifying previous execution allows double-charging on network retry."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_remediated.py"
+                },
+                "region": {
+                  "startLine": 63,
+                  "snippet": {
+                    "text": "res2 = await client.post(\"/accounts/1/withdraw\", json={\"amount\": 25.0, \"idempotency_key\": \"unique_idem_key_101\"})"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 34,
+                  "snippet": {
+                    "text": "@app.get(\"/health\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 38,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts\", status_code=200)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 39,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/\", status_code=200)"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 50,
+                  "snippet": {
+                    "text": "@app.get(\"/accounts/{account_id}/balance\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 58,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/{account_id}/deposit\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 96,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/{account_id}/withdraw\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 140,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/transfer\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 34,
+                  "snippet": {
+                    "text": "@app.get(\"/health\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 38,
+                  "snippet": {
+                    "text": "@app.get(\"/accounts/{account_id}/balance\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 46,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/{account_id}/deposit\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 84,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/{account_id}/withdraw\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-005",
+          "level": "warning",
+          "message": {
+            "text": "Missing Authentication Dependency: Financial ledger mutation endpoints declared without Depends() security guards."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
+                },
+                "region": {
+                  "startLine": 128,
+                  "snippet": {
+                    "text": "@app.post(\"/accounts/transfer\")"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "warning",
+          "message": {
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/analyzer.py"
+                },
+                "region": {
+                  "startLine": 131,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "warning",
+          "message": {
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/analyzer.py"
+                },
+                "region": {
+                  "startLine": 163,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "warning",
+          "message": {
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/database.py"
+                },
+                "region": {
+                  "startLine": 36,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "warning",
+          "message": {
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 92,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "warning",
+          "message": {
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 136,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "warning",
+          "message": {
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main.py"
+                },
+                "region": {
+                  "startLine": 188,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-006",
+          "level": "warning",
+          "message": {
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/main_remediated.py"
                 },
                 "region": {
                   "startLine": 80,
-                  "startColumn": 23
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "transfer",
-                  "kind": "function"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin002-main-transfer-no-lock"
-          }
-        },
-        {
-          "ruleId": "FIN-003",
-          "level": "error",
-          "message": {
-            "text": "Function 'transfer' issues two separate await db.commit() calls (lines 94 and 98). A crash between the two commits permanently destroys funds: the source is debited but the destination is never credited. This is a critical ACID violation."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 94,
-                  "startColumn": 5
-                }
-              },
-              "logicalLocations": [
-                {
-                  "name": "transfer",
-                  "kind": "function"
-                }
-              ]
-            }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin003-main-transfer-dual-commit"
-          }
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Function 'deposit' accepts an idempotency_key in the request body but never queries the transactions table to detect duplicate keys. A retried deposit will double-credit the account."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 34,
-                  "startColumn": 1
-                }
-              },
-              "logicalLocations": [
-                {
-                  "name": "deposit",
-                  "kind": "function"
-                }
-              ]
-            }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin004-main-deposit-no-idem-check"
-          }
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Function 'withdraw' accepts an idempotency_key but never validates it against existing transactions. A retried withdrawal will double-debit the account."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 52,
-                  "startColumn": 1
-                }
-              },
-              "logicalLocations": [
-                {
-                  "name": "withdraw",
-                  "kind": "function"
-                }
-              ]
-            }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin004-main-withdraw-no-idem-check"
-          }
-        },
-        {
-          "ruleId": "FIN-004",
-          "level": "warning",
-          "message": {
-            "text": "Function 'transfer' accepts an idempotency_key but never validates it. A retried transfer will execute both ledger legs a second time."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 78,
-                  "startColumn": 1
-                }
-              },
-              "logicalLocations": [
-                {
-                  "name": "transfer",
-                  "kind": "function"
-                }
-              ]
-            }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin004-main-transfer-no-idem-check"
-          }
-        },
-        {
-          "ruleId": "FIN-005",
-          "level": "warning",
-          "message": {
-            "text": "Route POST /accounts/{account_id}/deposit has no authentication dependency. Any unauthenticated caller can deposit arbitrary amounts into any account."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 33,
-                  "startColumn": 1
-                }
-              },
-              "logicalLocations": [
-                {
-                  "name": "deposit",
-                  "kind": "function"
-                }
-              ]
-            }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin005-main-deposit-no-auth"
-          }
-        },
-        {
-          "ruleId": "FIN-005",
-          "level": "warning",
-          "message": {
-            "text": "Route POST /accounts/{account_id}/withdraw has no authentication dependency. Any unauthenticated caller can withdraw from any account."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 52,
-                  "startColumn": 1
-                }
-              },
-              "logicalLocations": [
-                {
-                  "name": "withdraw",
-                  "kind": "function"
-                }
-              ]
-            }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin005-main-withdraw-no-auth"
-          }
-        },
-        {
-          "ruleId": "FIN-005",
-          "level": "warning",
-          "message": {
-            "text": "Route POST /accounts/transfer has no authentication dependency. Any unauthenticated caller can transfer funds between any two accounts."
-          },
-          "locations": [
-            {
-              "physicalLocation": {
-                "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
-                },
-                "region": {
-                  "startLine": 78,
-                  "startColumn": 1
-                }
-              },
-              "logicalLocations": [
-                {
-                  "name": "transfer",
-                  "kind": "function"
-                }
-              ]
-            }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin005-main-transfer-no-auth"
-          }
+          ]
         },
         {
           "ruleId": "FIN-006",
-          "level": "note",
+          "level": "warning",
           "message": {
-            "text": "Function 'deposit' has no try/except block with await db.rollback(). Exceptions during commit leave the async session in an indeterminate state."
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "demo_api/main_remediated.py"
                 },
                 "region": {
-                  "startLine": 34,
-                  "startColumn": 1
+                  "startLine": 124,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "deposit",
-                  "kind": "function"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin006-main-deposit-no-rollback"
-          }
+          ]
         },
         {
           "ruleId": "FIN-006",
-          "level": "note",
+          "level": "warning",
           "message": {
-            "text": "Function 'withdraw' has no try/except block with await db.rollback(). Exceptions during commit leave the async session in an indeterminate state."
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "demo_api/main_remediated.py"
                 },
                 "region": {
-                  "startLine": 52,
-                  "startColumn": 1
+                  "startLine": 176,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "withdraw",
-                  "kind": "function"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin006-main-withdraw-no-rollback"
-          }
+          ]
         },
         {
           "ruleId": "FIN-006",
-          "level": "note",
+          "level": "warning",
           "message": {
-            "text": "Function 'transfer' has no try/except block with await db.rollback(). Combined with the dual-commit FIN-003 issue, partial commits may not be reliably rolled back."
+            "text": "Missing Rollback Exception Guard: Database session operations without explicit await session.rollback() on exception."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "demo_api/seed.py"
                 },
                 "region": {
-                  "startLine": 78,
-                  "startColumn": 1
+                  "startLine": 28,
+                  "snippet": {
+                    "text": "except Exception:"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "transfer",
-                  "kind": "function"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin006-main-transfer-no-rollback"
-          }
+          ]
         },
         {
           "ruleId": "FIN-007",
-          "level": "warning",
+          "level": "note",
           "message": {
-            "text": "The standard library 'decimal' module is never imported in main.py. All balance arithmetic (account.balance +/- req.amount) operates silently on Python float, compounding the IEEE-754 drift from Float model columns."
+            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
           },
           "locations": [
             {
               "physicalLocation": {
                 "artifactLocation": {
-                  "uri": "demo_api/main.py",
-                  "uriBaseId": "%SRCROOT%"
+                  "uri": "blitzdev_agent/analyzer.py"
                 },
                 "region": {
                   "startLine": 1,
-                  "startColumn": 1
+                  "snippet": {
+                    "text": "# Missing Decimal module import"
+                  }
                 }
-              },
-              "logicalLocations": [
-                {
-                  "name": "module",
-                  "kind": "module"
-                }
-              ]
+              }
             }
-          ],
-          "fingerprints": {
-            "blitzdev/v1": "fin007-main-no-decimal-import"
-          }
-        }
-      ],
-      "artifacts": [
-        {
-          "location": {
-            "uri": "demo_api/main.py",
-            "uriBaseId": "%SRCROOT%"
-          },
-          "length": 3900,
-          "mimeType": "text/x-python"
+          ]
         },
         {
-          "location": {
-            "uri": "demo_api/models.py",
-            "uriBaseId": "%SRCROOT%"
+          "ruleId": "FIN-007",
+          "level": "note",
+          "message": {
+            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
           },
-          "length": 660,
-          "mimeType": "text/x-python"
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/rules.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "snippet": {
+                    "text": "# Missing Decimal module import"
+                  }
+                }
+              }
+            }
+          ]
         },
         {
-          "location": {
-            "uri": "demo_api/schemas.py",
-            "uriBaseId": "%SRCROOT%"
+          "ruleId": "FIN-007",
+          "level": "note",
+          "message": {
+            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
           },
-          "length": 420,
-          "mimeType": "text/x-python"
-        }
-      ],
-      "invocations": [
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "blitzdev_agent/test_generator.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "snippet": {
+                    "text": "# Missing Decimal module import"
+                  }
+                }
+              }
+            }
+          ]
+        },
         {
-          "executionSuccessful": true,
-          "toolExecutionNotifications": [],
-          "startTimeUtc": "2025-07-14T00:00:00.000Z",
-          "endTimeUtc": "2025-07-14T00:00:00.000Z"
+          "ruleId": "FIN-007",
+          "level": "note",
+          "message": {
+            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/models.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "snippet": {
+                    "text": "# Missing Decimal module import"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-007",
+          "level": "note",
+          "message": {
+            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "demo_api/seed.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "snippet": {
+                    "text": "# Missing Decimal module import"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-007",
+          "level": "note",
+          "message": {
+            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_exploit.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "snippet": {
+                    "text": "# Missing Decimal module import"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "FIN-007",
+          "level": "note",
+          "message": {
+            "text": "Missing Decimal Module Import: Financial arithmetic detected in module without explicit decimal.Decimal import."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "tests/test_concurrency_remediated.py"
+                },
+                "region": {
+                  "startLine": 1,
+                  "snippet": {
+                    "text": "# Missing Decimal module import"
+                  }
+                }
+              }
+            }
+          ]
         }
       ]
     }
