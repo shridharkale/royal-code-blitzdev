@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 from contextlib import asynccontextmanager
 from decimal import Decimal, ROUND_HALF_UP
 from fastapi import FastAPI, Depends, HTTPException, status
@@ -32,6 +32,13 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+from fastapi.responses import RedirectResponse
+
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    """Redirect root traffic directly to interactive OpenAPI documentation."""
+    return RedirectResponse(url="/docs")
+    
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "Royal Bank Ledger API (Production Hardened)"}
