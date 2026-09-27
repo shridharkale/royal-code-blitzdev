@@ -7,10 +7,19 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   fintech-security-scan:
     name: AST Invariant & Concurrency Audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
 
     steps:
       - name: Checkout Repository
@@ -41,7 +50,16 @@ jobs:
 
       - name: Upload SARIF Security Telemetry
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
+        continue-on-error: true
         with:
           sarif_file: output/blitzdev_report.sarif
           category: blitzdev-ast-guardian
+
+      - name: Archive BlitzDev Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: blitzdev-audit-deliverables
+          path: |
+            output/audit_report.md
+            output/blitzdev_report.sarif
