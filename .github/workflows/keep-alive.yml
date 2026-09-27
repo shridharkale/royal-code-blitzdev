@@ -1,0 +1,14 @@
+name: Render Backend Keep-Alive
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Health Endpoint
+        run: |
+          curl -sS --retry 3 https://royal-code-blitzdev.onrender.com/health || exit 0
