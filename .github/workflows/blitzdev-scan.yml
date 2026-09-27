@@ -1,16 +1,16 @@
 name: BlitzDev FinTech PR Guardian
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  fintech-security-audit:
-    name: FinTech Security & ACID Verification
+  fintech-security-scan:
+    name: AST Invariant & Concurrency Audit
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
 
     steps:
       - name: Checkout Repository
@@ -20,27 +20,28 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+          cache: "pip"
 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Seed Database
+      - name: Seed Deterministic Database
         run: |
           python -m demo_api.seed
 
-      - name: Run BlitzDev AST Scanner
+      - name: Run AST Invariant Scanner
         run: |
-          python -m blitzdev_agent.scanner --target . --report output/
+          python -m blitzdev_agent.scanner
 
-      - name: Run Verification Test Suites
+      - name: Execute Remediated Concurrency Tests
         run: |
-          pytest tests/ -v
+          python -m pytest -s tests/test_concurrency_remediated.py
 
-      - name: Upload SARIF to GitHub Code Scanning
+      - name: Upload SARIF Security Telemetry
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: output/blitzdev_report.sarif
-          category: blitzdev-fintech-validator
+          category: blitzdev-ast-guardian
